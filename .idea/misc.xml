@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Matias/Desktop/Koulujutut/Mobiiliprojekti/app/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Matias/Desktop/Koulujutut/Mobiiliprojekti/app/src/main/res/layout/app_toolbar.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Matias/Desktop/Koulujutut/Mobiiliprojekti/app/src/main/res/menu/navigation_menu.xml" value="0.36666666666666664" />
       </map>
     </option>
   </component>
@@ -12,5 +14,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.36666666666666664" />
+      </ProjectState>
+    </option>
   </component>
 </project>
