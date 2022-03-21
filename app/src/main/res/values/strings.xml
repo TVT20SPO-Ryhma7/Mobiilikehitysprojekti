@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">Mobiilikehitysprojekti</string>
+    <string name="app_name">Minipelikokoelma</string>
+    <string name="matopeli">Matopeli</string>
+    <string name="global_rank">Global Rank:</string>
+    <string name="tetris">Tetris</string>
+    <string name="trivia">Trivia</string>
+    <string name="nopeuspeli">Nopeuspeli</string>
 </resources>
