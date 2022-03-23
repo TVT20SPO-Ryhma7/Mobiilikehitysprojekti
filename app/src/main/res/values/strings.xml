@@ -5,4 +5,8 @@
     <string name="tetris">Tetris</string>
     <string name="trivia">Trivia</string>
     <string name="nopeuspeli">Nopeuspeli</string>
+    <string name="navigation_drawer_open">Navigation drawer open</string>
+    <string name="navigation_drawer_close">Navigation drawer close</string>
+    <string name="avatar">avatar</string>
+    <string name="game_image">Game image</string>
 </resources>

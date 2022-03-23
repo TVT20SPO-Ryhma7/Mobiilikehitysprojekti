@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
     tools:context=".MainActivity"
     android:id="@+id/drawer">
 
@@ -13,38 +12,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
+        <include
+            layout="@layout/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/ivAvatar"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@color/teal_200"
-                android:layout_marginEnd="40dp"/>
-
-            <TextView
-                android:id="@+id/tvUserInfo"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:text="User info"
-                android:textSize="25sp"
-                android:gravity="center"
-                android:textColor="@color/black"
-                android:background="@color/teal_200" />
-
-        </LinearLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLeaderboards"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_marginVertical="15dp"
-            android:text="View all leaderboards"
-            android:textColor="@color/black"
-            android:backgroundTint="@color/teal_200" />
+            android:layout_height="wrap_content" />
 
         <ScrollView
             android:id="@+id/svGames"
@@ -54,299 +25,362 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="10dp"
                 android:orientation="vertical">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/mcvMatopeli"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="180dp">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="40dp"
+                        app:cardCornerRadius="50dp"
+                        app:cardPreventCornerOverlap="false">
 
                         <ImageView
-                            android:id="@+id/ivMatopeli"
-                            android:layout_width="match_parent"
+                            android:id="@+id/ivAvatar"
+                            android:layout_width="100dp"
                             android:layout_height="100dp"
-                            android:src="@color/purple_700" />
+                            android:src="@color/teal_200"
+                            android:contentDescription="@string/avatar"/>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:id="@+id/tvUserInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:text="User info"
+                        android:textSize="25sp"
+                        android:gravity="center"
+                        android:textColor="@color/black"
+                        android:background="@color/teal_200" />
+
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLeaderboards"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:text="View all leaderboards"
+                    android:textColor="@color/black"
+                    android:backgroundTint="@color/teal_200" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/mcvMatopeli"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginVertical="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="horizontal">
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/tvMatopeli"
-                                android:layout_width="210dp"
-                                android:layout_height="match_parent"
-                                android:background="@color/purple_200"
-                                android:gravity="center"
-                                android:text="@string/matopeli"
-                                android:textColor="@color/black"
-                                android:textSize="30sp" />
+                            <ImageView
+                                android:id="@+id/ivMatopeli"
+                                android:layout_width="match_parent"
+                                android:layout_height="100dp"
+                                android:src="@color/purple_700"
+                                android:contentDescription="@string/game_image" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@color/teal_200"
-                                android:orientation="vertical"
-                                android:paddingHorizontal="15dp">
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="horizontal">
 
                                 <TextView
-                                    android:id="@+id/tvMatopeliPoints"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1"
+                                    android:id="@+id/tvMatopeli"
+                                    android:layout_width="210dp"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/purple_200"
                                     android:gravity="center"
-                                    android:text="100 Pts"
+                                    android:text="@string/matopeli"
                                     android:textColor="@color/black"
-                                    android:textSize="25sp" />
+                                    android:textSize="30sp" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/global_rank"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp" />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/teal_200"
+                                    android:orientation="vertical"
+                                    android:paddingHorizontal="15dp">
 
-                                <TextView
-                                    android:id="@+id/tvMatopeliRank"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="50th"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp" />
+                                    <TextView
+                                        android:id="@+id/tvMatopeliPoints"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        android:gravity="center"
+                                        android:text="100 Pts"
+                                        android:textColor="@color/black"
+                                        android:textSize="25sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/global_rank"
+                                        android:textColor="@color/black"
+                                        android:textSize="15sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvMatopeliRank"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="50th"
+                                        android:textColor="@color/black"
+                                        android:textSize="15sp" />
+
+                                </LinearLayout>
 
                             </LinearLayout>
 
                         </LinearLayout>
 
-                    </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/mcvTetris"
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    android:layout_marginTop="20dp">
-
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/mcvTetris"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginVertical="10dp"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:id="@+id/ivTetris"
-                            android:layout_width="match_parent"
-                            android:layout_height="100dp"
-                            android:src="@color/purple_700" />
+                        android:layout_height="180dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="horizontal">
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/tvTetris"
-                                android:layout_width="210dp"
-                                android:layout_height="match_parent"
-                                android:background="@color/purple_200"
-                                android:gravity="center"
-                                android:text="@string/tetris"
-                                android:textColor="@color/black"
-                                android:textSize="30sp" />
+                            <ImageView
+                                android:id="@+id/ivTetris"
+                                android:layout_width="match_parent"
+                                android:layout_height="100dp"
+                                android:src="@color/purple_700"
+                                android:contentDescription="@string/game_image" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@color/teal_200"
-                                android:orientation="vertical"
-                                android:paddingHorizontal="15dp">
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="horizontal">
 
                                 <TextView
-                                    android:id="@+id/tvTetrisPoints"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1"
+                                    android:id="@+id/tvTetris"
+                                    android:layout_width="210dp"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/purple_200"
                                     android:gravity="center"
-                                    android:text="3600 Pts"
+                                    android:text="@string/tetris"
                                     android:textColor="@color/black"
-                                    android:textSize="25sp" />
+                                    android:textSize="30sp" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/global_rank"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp" />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/teal_200"
+                                    android:orientation="vertical"
+                                    android:paddingHorizontal="15dp">
 
-                                <TextView
-                                    android:id="@+id/tvTetrisRank"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="4th"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp" />
+                                    <TextView
+                                        android:id="@+id/tvTetrisPoints"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        android:gravity="center"
+                                        android:text="3600 Pts"
+                                        android:textColor="@color/black"
+                                        android:textSize="25sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/global_rank"
+                                        android:textColor="@color/black"
+                                        android:textSize="15sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvTetrisRank"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="4th"
+                                        android:textColor="@color/black"
+                                        android:textSize="15sp" />
+
+                                </LinearLayout>
 
                             </LinearLayout>
 
                         </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/mcvTrivia"
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    android:layout_marginTop="20dp">
-
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/mcvTrivia"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginVertical="10dp"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:id="@+id/ivTrivia"
-                            android:layout_width="match_parent"
-                            android:layout_height="100dp"
-                            android:src="@color/purple_700" />
+                        android:layout_height="180dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="horizontal">
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/tvTrivia"
-                                android:layout_width="210dp"
-                                android:layout_height="match_parent"
-                                android:background="@color/purple_200"
-                                android:gravity="center"
-                                android:text="@string/trivia"
-                                android:textColor="@color/black"
-                                android:textSize="30sp" />
+                            <ImageView
+                                android:id="@+id/ivTrivia"
+                                android:layout_width="match_parent"
+                                android:layout_height="100dp"
+                                android:src="@color/purple_700"
+                                android:contentDescription="@string/game_image" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@color/teal_200"
-                                android:orientation="vertical"
-                                android:paddingHorizontal="15dp">
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="horizontal">
 
                                 <TextView
-                                    android:id="@+id/tvTriviaPoints"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1"
+                                    android:id="@+id/tvTrivia"
+                                    android:layout_width="210dp"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/purple_200"
                                     android:gravity="center"
-                                    android:text="1400 Pts"
+                                    android:text="@string/trivia"
                                     android:textColor="@color/black"
-                                    android:textSize="25sp" />
+                                    android:textSize="30sp" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/global_rank"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp" />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/teal_200"
+                                    android:orientation="vertical"
+                                    android:paddingHorizontal="15dp">
 
-                                <TextView
-                                    android:id="@+id/tvTriviaRank"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="20th"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp" />
+                                    <TextView
+                                        android:id="@+id/tvTriviaPoints"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        android:gravity="center"
+                                        android:text="1400 Pts"
+                                        android:textColor="@color/black"
+                                        android:textSize="25sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/global_rank"
+                                        android:textColor="@color/black"
+                                        android:textSize="15sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvTriviaRank"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="20th"
+                                        android:textColor="@color/black"
+                                        android:textSize="15sp" />
+
+                                </LinearLayout>
 
                             </LinearLayout>
 
                         </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/mcvNopeuspeli"
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    android:layout_marginTop="20dp">
-
-                    <LinearLayout
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/mcvNopeuspeli"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginVertical="10dp"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:id="@+id/ivNopeuspeli"
-                            android:layout_width="match_parent"
-                            android:layout_height="100dp"
-                            android:src="@color/purple_700" />
+                        android:layout_height="180dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="horizontal">
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/tvNopeuspeli"
-                                android:layout_width="210dp"
-                                android:layout_height="match_parent"
-                                android:background="@color/purple_200"
-                                android:gravity="center"
-                                android:text="@string/nopeuspeli"
-                                android:textColor="@color/black"
-                                android:textSize="30sp" />
+                            <ImageView
+                                android:id="@+id/ivNopeuspeli"
+                                android:layout_width="match_parent"
+                                android:layout_height="100dp"
+                                android:src="@color/purple_700"
+                                android:contentDescription="@string/game_image" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@color/teal_200"
-                                android:orientation="vertical"
-                                android:paddingHorizontal="15dp">
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="horizontal">
 
                                 <TextView
-                                    android:id="@+id/tvNopeuspeliPoints"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1"
+                                    android:id="@+id/tvNopeuspeli"
+                                    android:layout_width="210dp"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/purple_200"
                                     android:gravity="center"
-                                    android:text="40 Pts"
+                                    android:text="@string/nopeuspeli"
                                     android:textColor="@color/black"
-                                    android:textSize="25sp" />
+                                    android:textSize="30sp" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/global_rank"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp" />
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/teal_200"
+                                    android:orientation="vertical"
+                                    android:paddingHorizontal="15dp">
 
-                                <TextView
-                                    android:id="@+id/tvNopeuspeliRank"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="200th"
-                                    android:textColor="@color/black"
-                                    android:textSize="15sp" />
+                                    <TextView
+                                        android:id="@+id/tvNopeuspeliPoints"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="0dp"
+                                        android:layout_weight="1"
+                                        android:gravity="center"
+                                        android:text="40 Pts"
+                                        android:textColor="@color/black"
+                                        android:textSize="25sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/global_rank"
+                                        android:textColor="@color/black"
+                                        android:textSize="15sp" />
+
+                                    <TextView
+                                        android:id="@+id/tvNopeuspeliRank"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="200th"
+                                        android:textColor="@color/black"
+                                        android:textSize="15sp" />
+
+                                </LinearLayout>
 
                             </LinearLayout>
 
                         </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -356,9 +390,11 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
+        app:itemIconSize="30dp"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/navigation_menu" />
+        app:menu="@menu/navigation_menu"
+        app:headerLayout="@layout/navigation_header"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

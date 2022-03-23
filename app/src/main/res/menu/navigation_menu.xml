@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/nav_account"
-        android:title="Item1" />
+    <group
+        android:checkableBehavior="single">
 
-    <item
-        android:id="@+id/nav_settings"
-        android:title="Item2" />
+        <item
+            android:icon="@drawable/ic_baseline_sports_esports_242"
+            android:id="@+id/nav_gamePref"
+            android:title="Game Preferences" />
 
-    <item
-        android:id="@+id/nav_logout"
-        android:title="Item3" />
+        <item
+            android:icon="@drawable/ic_baseline_settings_24"
+            android:id="@+id/nav_settings"
+            android:title="Settings" />
+    </group>
 </menu>
