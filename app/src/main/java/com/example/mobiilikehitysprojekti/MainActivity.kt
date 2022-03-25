@@ -1,5 +1,7 @@
 package com.example.mobiilikehitysprojekti
 
+import android.app.Activity
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -66,8 +68,10 @@ class MainActivity : AppCompatActivity() {
     private val gameClick: View.OnClickListener = View.OnClickListener { view ->
         when (view.id) {
             R.id.mcvMatopeli -> {
-                //Placeholder
-                Toast.makeText(this, "Matopeli", Toast.LENGTH_SHORT).show()
+
+                // Creates new intent and loads 'GameSnake' activity
+                val snakeIntent: Intent = Intent(this,GameSnake::class.java)
+                this.startActivity(snakeIntent)
             }
             R.id.mcvTetris -> {
                 //Placeholder
