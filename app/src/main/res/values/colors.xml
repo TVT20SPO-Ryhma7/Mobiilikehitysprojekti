@@ -7,4 +7,10 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="burntOrange">#EE4E34</color>
+    <color name="mint">#C5FAD5</color>
+    <color name="butter">#FFFFD2</color>
+    <color name="lavender">#E2D1F9</color>
+    <color name="teal">#317773</color>
+    <color name="cyan">#00FFFF</color>
 </resources>
