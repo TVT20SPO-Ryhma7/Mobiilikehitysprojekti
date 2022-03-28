@@ -151,7 +151,9 @@ class MainActivity : AppCompatActivity() {
     private val gameClick: View.OnClickListener = View.OnClickListener { view ->
         when (view.id) {
             R.id.mcvMatopeli -> {
-
+                // Creates new intent and loads 'GameSnake' activity
+                val snakeIntent: Intent = Intent(this,GameSnake::class.java)
+                this.startActivity(snakeIntent)
             }
             R.id.mcvTetris -> {
                 //Placeholder
