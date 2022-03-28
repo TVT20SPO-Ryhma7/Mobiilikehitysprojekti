@@ -4,13 +4,13 @@
         android:checkableBehavior="single">
 
         <item
-            android:icon="@drawable/ic_baseline_sports_esports_242"
+            android:icon="@drawable/ic_baseline_sports_esports_24"
             android:id="@+id/nav_gamePref"
-            android:title="Game Preferences" />
+            android:title="@string/game_preferences" />
 
         <item
             android:icon="@drawable/ic_baseline_settings_24"
             android:id="@+id/nav_settings"
-            android:title="Settings" />
+            android:title="@string/settings" />
     </group>
 </menu>
