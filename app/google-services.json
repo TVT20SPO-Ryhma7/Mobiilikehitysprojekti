@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "618279564838",
+    "project_id": "mobiiliprojekti-r7",
+    "storage_bucket": "mobiiliprojekti-r7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:618279564838:android:03c92fc96d2a95446198e7",
+        "android_client_info": {
+          "package_name": "com.example.mobiilikehitysprojekti"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "618279564838-kbggpjs4r1n0nd6lksoogkaruppntvhe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mobiilikehitysprojekti",
+            "certificate_hash": "32beaeaaa7b4576f0c4f1e5d8400384c2d19fb1a"
+          }
+        },
+        {
+          "client_id": "618279564838-s44dlundn9fpj316i75m0c30elmlfej0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCE8-7h0jGdu7Ay-g8VZD10dnpiewIyfkE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "618279564838-j7h5nqrnh6o5ukp86106suvj8514bd39.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

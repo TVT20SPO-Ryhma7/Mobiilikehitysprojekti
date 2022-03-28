@@ -1,37 +1,27 @@
 package com.example.mobiilikehitysprojekti
 
-import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
-import java.lang.Exception
 
-class MainActivity : AppCompatActivity() {
+class MainActivityLoggedIn : AppCompatActivity() {
 
     //Authentication
-    private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
-
-    //Error logging tag
-    private companion object{
-        private const val TAG = "GOOGLE_SIGN_IN_TAG"
+    private val firebaseAuth by lazy {
+        FirebaseAuth.getInstance()
     }
 
     //Things needed for sidebar
@@ -41,9 +31,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main_logged_in)
 
-        //Configuring the google sign-in
+        //Configuring the google sign-out
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.def_web_client_id))
             .requestEmail()
@@ -51,17 +41,23 @@ class MainActivity : AppCompatActivity() {
 
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
 
-        //Initializing firebase authentication
-        firebaseAuth = FirebaseAuth.getInstance()
-
-        //Sign in button in sidebar
-        navigationView = findViewById(R.id.navigationViewLoggedOut)
+        //Sign out button in sidebar
+        navigationView = findViewById(R.id.navigationViewLoggedIn)
         val headerView: View = navigationView.getHeaderView(0)
-        val signInButton: Button = headerView.findViewById(R.id.btnLogIn)
-        signInButton.setOnClickListener {
-            val signInIntent:Intent = googleSignInClient.signInIntent
-            signInGoogle.launch(signInIntent)
+        val signOutButton: Button = headerView.findViewById(R.id.btnLogOut)
+        signOutButton.setOnClickListener {
+            googleSignInClient.signOut().addOnCompleteListener {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
         }
+
+        //Displaying user info in main menu and sidebar
+        val textViewUserName: TextView = headerView.findViewById(R.id.tvUserName)
+        textViewUserName.text = firebaseAuth.currentUser!!.displayName
+        val textViewUserInfo: TextView = findViewById(R.id.tvUserInfo)
+        textViewUserInfo.text = firebaseAuth.currentUser!!.displayName
 
         //Initializing game cardview buttons
         val matopeliCard: View = findViewById(R.id.mcvMatopeli)
@@ -78,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         //Initializing sidebar
-        drawerLayout = findViewById(R.id.drawerLoggedOut)
+        drawerLayout = findViewById(R.id.drawerLoggedIn)
         actionBarToggle = ActionBarDrawerToggle(this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
 
         //Listener for opening sidebar
@@ -105,48 +101,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //Beginning google sign in
-    private var signInGoogle = registerForActivityResult (
-        ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val task:Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            handleResult(task)
-        }
-    }
-
-    //Handling google sign in result
-    private fun handleResult(completedTask: Task<GoogleSignInAccount>) {
-        try {
-            val account: GoogleSignInAccount? = completedTask.getResult(ApiException::class.java)
-            if (account != null) {
-                firebaseAuthWithGoogleAccount(account)
-            }
-        } catch (e: Exception){
-            Log.d(TAG, "onActivityResult: ${e.message}")
-        }
-    }
-
-    //Authenticating user to firebase with google user
-    private fun firebaseAuthWithGoogleAccount(account: GoogleSignInAccount){
-        val credential= GoogleAuthProvider.getCredential(account.idToken,null)
-        firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task->
-            if(task.isSuccessful) {
-                val intent = Intent(this, MainActivityLoggedIn::class.java)
-                startActivity(intent)
-                finish()
-            }
-        }
-    }
-
-    //Signing in automatically when starting the app
-    override fun onStart() {
-        super.onStart()
-        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
-            startActivity(Intent(this, MainActivityLoggedIn::class.java))
-            finish()
-        }
-    }
-
     //Listener for clicking game buttons
     private val gameClick: View.OnClickListener = View.OnClickListener { view ->
         when (view.id) {
@@ -160,8 +114,8 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Tetris", Toast.LENGTH_SHORT).show()
             }
             R.id.mcvTrivia -> {
-                val triviaIntent = Intent(this, GameTrivia::class.java)
-                startActivity(triviaIntent)
+                //Placeholder
+                Toast.makeText(this, "Trivia", Toast.LENGTH_SHORT).show()
             }
             R.id.mcvNopeuspeli -> {
                 //Placeholder
