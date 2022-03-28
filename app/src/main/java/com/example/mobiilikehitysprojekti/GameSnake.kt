@@ -26,7 +26,6 @@ class GameSnake : AppCompatActivity() {
     private var isStarted: Boolean = false  // Whether game has been started with startGame function
     private var isPaused: Boolean = false   // Whether already started game has been paused
     private var gameClock: Timer = Timer()
-    private var currentTick: Long = 0
     private val gameLogicInterval: Long =
         500 // Interval in milliseconds how often game logic gets executed
 
@@ -40,10 +39,10 @@ class GameSnake : AppCompatActivity() {
 
     private var score: Int = 0
     private var snakeLength: Int = 0
-    private var snakeStartLength: Int = 4   // Max safe start length is 4
+    private var snakeStartLength: Int = 5   // Max safe start length is 4
 
     // This 2D array represents the 'game board' (made of 'plots') of which the snake and its food move around
-    private var gameState: GameState = GameState(gameDimensionX,gameDimensionY,snakeStartLength)
+    private var snakeGame: SnakeGame = SnakeGame(gameDimensionX,gameDimensionY,snakeStartLength)
 
 
 
@@ -120,7 +119,7 @@ class GameSnake : AppCompatActivity() {
             }
         }, 0, gameLogicInterval)
 
-        gameState.setStateNewGame()
+        snakeGame.newGame()
 
         isStarted = true
     }
@@ -159,12 +158,11 @@ class GameSnake : AppCompatActivity() {
 
     // Gets called in regular intervals to advance game state
     private fun onGameTick() {
-        Log.i("GameTick", "Tick: $currentTick")
+        Log.i("GameTick", "Tick: ${snakeGame.currentTick}")
         handleGameLogic()
 
         // Update view on the user's device
         gameView.setImageBitmap(renderGameState())
-        currentTick++
     }
 
     // Advances game state, call once per game tick
@@ -172,16 +170,16 @@ class GameSnake : AppCompatActivity() {
 
         // Handle input
         when(nextInput){
-            GameInput.NONE -> gameState.snakeMoveForward()
-            GameInput.LEFT -> gameState.snakeMoveLeft()
-            GameInput.RIGHT -> gameState.snakeMoveRight()
-            GameInput.UP -> gameState.snakeMoveForward()
-            GameInput.DOWN -> gameState.snakeMoveForward()
+            GameInput.NONE -> {}
+            GameInput.LEFT -> snakeGame.snakeStageMoveLeft()
+            GameInput.RIGHT -> snakeGame.snakeStageMoveRight()
+            GameInput.UP -> snakeGame.snakeStageMoveUp()
+            GameInput.DOWN -> snakeGame.snakeStageMoveDown()
 
         }
 
-        // TODO: Other game logic
-
+        // Advance game state
+        snakeGame.next()
 
         // Reset next input
         nextInput = GameInput.NONE
@@ -194,21 +192,21 @@ class GameSnake : AppCompatActivity() {
             Bitmap.createBitmap(gameDimensionX, gameDimensionY, Bitmap.Config.ARGB_8888)
 
         // Iterates all values from game state and set corresponding pixels
-        for (x in 0 until gameState.getState().size - 1) {
-            for (y in 0 until gameState.getState()[0].size - 1) {
+        for (x in 0 until snakeGame.getState().size - 1) {
+            for (y in 0 until snakeGame.getState()[0].size - 1) {
 
                 // If plot is empty (0)
-                if (gameState.getState()[x][y] == 0) {
+                if (snakeGame.getState()[x][y] == 0) {
                     renderedView.setPixel(x, y, Color.WHITE)
                 }
 
                 // If plot is occupied by snake (1)
-                else if (gameState.getState()[x][y] == 1) {
+                else if (snakeGame.getState()[x][y] == 1) {
                     renderedView.setPixel(x, y, Color.BLACK)
                 }
 
                 // If plot is occupied by food (2)
-                else if (gameState.getState()[x][y] == 2) {
+                else if (snakeGame.getState()[x][y] == 2) {
                     renderedView.setPixel(x, y, Color.RED)
                 }
 
@@ -228,28 +226,36 @@ class GameSnake : AppCompatActivity() {
 }
 
 // Class to handle and keep track of current state of a snake game
-private class GameState(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
+private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
 
     // Initialization ------------------------------------------------------------------------------
+
+    // The current state cycle where the game logic is at
+    var currentTick: Long = 0
+        get
+        private set
 
     private var sizeX: Int = gameSizeX
     private var sizeY: Int = gameSizeY
     private var startLength: Int = snakeStartLength
 
     init{
+
         // If any of the game dimensions are less than 10, set them to minimum of 10
         if (sizeX < 10){sizeX = 10}
         if (sizeY < 10){sizeY = 10}
 
         // If snake start length is more than safe starting length of 4, set to maximum of 4
-        if (startLength > 4){startLength = 4}
+        //if (startLength > 4){startLength = 4}
     }
 
-    // Automatically create a new snake with its head starting position in the center of the world
-    private var snake: Snake = Snake(Vector2Int(sizeX/2,sizeY/2), startLength,sizeX,sizeY)
+
 
 
     // State Related -------------------------------------------------------------------------------
+
+    // Directions of how the game map can be navigated with
+    enum class Direction{UP,DOWN,LEFT,RIGHT}
 
     // This 2D array represents the 'game board' (made of 'plots') of which the snake and its food move around
     // 0 = Empty Plot
@@ -257,9 +263,36 @@ private class GameState(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
     // 2 = Plot Occupied by Food
     private var gameState: Array<IntArray> = Array(sizeX) { IntArray(sizeY) }
 
-    // Update the current game state, gets automatically called whenever game state changes
-    private fun updateState(){
-        // Draw empty state
+    // Automatically create a new snake with its head starting position in the center of the world
+    private var snake: Snake = Snake(Vector2Int(sizeX/2,sizeY/2), startLength)
+
+
+    // Staged Variables ----------------------------------------------------------------------------
+    // These variables get reset to their default values each game cycle
+
+    // Next path the snake will attempt to take in current game cycle
+    private var stagedSnakeNextMoveDirection: Snake.MoveDirection = Snake.MoveDirection.FORWARD
+
+
+
+
+
+    // Functions -----------------------------------------------------------------------------------
+
+    // Applies staged changes to current game state cycle and
+    // Should be called once per tick to advance the game!
+    open fun next(){
+
+        // Move snake according to proposed changes
+        snake.move(stagedSnakeNextMoveDirection)
+
+        // Reset proposed change variables
+        stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+
+
+
+
+        // Set empty state
         setStateToSingleValue(0)
 
         // Add snake to state
@@ -269,6 +302,8 @@ private class GameState(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
 
         // Add food to state
 
+
+        currentTick++
     }
 
     // Sets single plot in the game state to a given value
@@ -286,7 +321,7 @@ private class GameState(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
 
 
     // Sets all values in game state to given parameter
-    open fun setStateToSingleValue(value: Int){
+    private fun setStateToSingleValue(value: Int){
 
         // Iterates all values from game state and sets them
         for (x in 0 until gameState.size - 1) {
@@ -298,7 +333,7 @@ private class GameState(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
     }
 
     // Sets current game state to a default beginning of a new game of snake
-    open fun setStateNewGame(){
+    open fun newGame(){
 
         // Set all values to 0
         for (x in 0 until gameState.size - 1) {
@@ -309,13 +344,11 @@ private class GameState(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
         }
 
         // Create a new snake
-        snake = Snake(Vector2Int(sizeX/2,sizeY/2), startLength,sizeX,sizeY)
+        snake = Snake(Vector2Int(sizeX/2,sizeY/2), startLength)
 
         // Place starting snake food
         // TODO
 
-        // Apply updates
-        updateState()
     }
 
 
@@ -331,111 +364,193 @@ private class GameState(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
         return 0
     }
 
-    // Moves snake's head and its following body to this direction from snake heading
-    open fun snakeMoveForward(){
-        snake.moveSnake(Snake.SnakeSteer.FORWARD)
-        updateState()
+    // Attempts to move if possible snake's head and its following body to this direction from snake heading
+    open fun snakeStageMoveUp(){
+        when(snake.getSnakeHeading()){
+            SnakeGame.Direction.UP -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            SnakeGame.Direction.DOWN -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            SnakeGame.Direction.LEFT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.RIGHT
+            SnakeGame.Direction.RIGHT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.LEFT
+        }
     }
 
-    // Moves snake's head and its following body to this direction from snake heading
-    open fun snakeMoveLeft(){
-        snake.moveSnake(Snake.SnakeSteer.LEFT)
-        updateState()
+    // Attempts to move if possible snake's head and its following body to this direction from snake heading
+    open fun snakeStageMoveDown(){
+        when(snake.getSnakeHeading()){
+            SnakeGame.Direction.UP -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            SnakeGame.Direction.DOWN -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            SnakeGame.Direction.LEFT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.LEFT
+            SnakeGame.Direction.RIGHT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.RIGHT
+        }
     }
 
-    // Moves snake's head and its following body to this direction from snake heading
-    open fun snakeMoveRight(){
-        snake.moveSnake(Snake.SnakeSteer.RIGHT)
-        updateState()
+    // Attempts to move if possible snake's head and its following body to this direction from snake heading
+    open fun snakeStageMoveLeft(){
+        when(snake.getSnakeHeading()){
+            SnakeGame.Direction.UP -> stagedSnakeNextMoveDirection = Snake.MoveDirection.LEFT
+            SnakeGame.Direction.DOWN -> stagedSnakeNextMoveDirection = Snake.MoveDirection.RIGHT
+            SnakeGame.Direction.LEFT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            SnakeGame.Direction.RIGHT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+        }
+    }
+
+    // Attempts to move if possible snake's head and its following body to this direction from snake heading
+    open fun snakeStageMoveRight(){
+        when(snake.getSnakeHeading()){
+            SnakeGame.Direction.UP -> snake.move(Snake.MoveDirection.RIGHT)
+            SnakeGame.Direction.DOWN -> snake.move(Snake.MoveDirection.LEFT)
+            SnakeGame.Direction.LEFT -> snake.move(Snake.MoveDirection.FORWARD)
+            SnakeGame.Direction.RIGHT -> snake.move(Snake.MoveDirection.FORWARD)
+        }
+    }
+
+
+    // Helper --------------------------------------------------------------------------------------
+
+    // Returns the value of an adjacent block
+    private fun checkAdjacentPlotValue(plot: Vector2Int, direction: SnakeGame.Direction):Int{
+        var adjacentPlot: Vector2Int = getAdjacentPlotPosition(plot,direction)
+        return gameState[adjacentPlot.x][adjacentPlot.y]
+    }
+
+
+    // Static --------------------------------------------------------------------------------------
+    companion object{
+
+        // Gets the position of a plot adjacent the the given origin and given direction
+        open fun getAdjacentPlotPosition(plot: Vector2Int, direction: SnakeGame.Direction): Vector2Int{
+            var adjacentPlot: Vector2Int = Vector2Int(0,0) // Initialize variable
+
+            when(direction){
+                SnakeGame.Direction.UP -> {
+                    adjacentPlot.x = plot.x
+                    adjacentPlot.y = plot.y - 1
+                }
+                SnakeGame.Direction.DOWN -> {
+                    adjacentPlot.x = plot.x
+                    adjacentPlot.y = plot.y + 1
+                }
+                SnakeGame.Direction.LEFT -> {
+                    adjacentPlot.x = plot.x - 1
+                    adjacentPlot.y = plot.y
+                }
+                SnakeGame.Direction.RIGHT -> {
+                    adjacentPlot.x = plot.x + 1
+                    adjacentPlot.y = plot.y
+                }
+            }
+            return adjacentPlot
+        }
+
+        // Checks from origin that in which proportional direction does a destination reside
+        open fun directionFromOrigin(origin: Vector2Int, destination: Vector2Int): SnakeGame.Direction{
+            var dominantDirection: SnakeGame.Direction // Initialize local variable
+
+            var longestMagnitude: Int = 0
+            val posXMag: Int = destination.x - origin.x
+            val negXMag: Int = origin.x - destination.x
+            val posYMag: Int = destination.y - origin.y
+            val negYMag: Int = origin.y - destination.y
+
+            // Check positive X magnitude (initial)
+            longestMagnitude = posXMag
+            dominantDirection = SnakeGame.Direction.RIGHT
+
+            // Check negative X magnitude
+            if (longestMagnitude < negXMag){
+                longestMagnitude = negXMag
+                dominantDirection = SnakeGame.Direction.LEFT
+            }
+
+            // Check positive Y magnitude
+            if (longestMagnitude < posYMag){
+                longestMagnitude = posYMag
+                dominantDirection = SnakeGame.Direction.DOWN
+            }
+
+            // Check negative Y magnitude
+            if (longestMagnitude < negYMag){
+                longestMagnitude = negYMag
+                longestMagnitude = negYMag
+                dominantDirection = SnakeGame.Direction.UP
+            }
+
+            return dominantDirection
+        }
     }
 
 
 }
 
 
-// Class to keep track of the snake's state and position of its body, by default new snake's body is placed left from its head
-private class Snake(headStartPosition: Vector2Int, startLength: Int, worldSizeX: Int, worldSizeY: Int){
+
+
+// Class to keep track of the snake's position
+private class Snake(headStartPosition: Vector2Int, startLength: Int){
 
     // Stores the coordinate values of the snakes body, array index 0 is the snakes head
-    private var snakeBody: MutableList<Vector2Int>
+    private var snakeBody: MutableList<Vector2Int> = mutableListOf(headStartPosition)
 
-    // Directions of which the snake can move on the map
-    enum class SnakeHeading{UP,DOWN,LEFT,RIGHT}
     // Current true direction of which the snake is moving if it headed forward
-    private var snakeHeading: SnakeHeading = SnakeHeading.RIGHT
+    private var snakeHeading: SnakeGame.Direction = SnakeGame.Direction.RIGHT
 
-    // Direction of which the snake can steer itself
-    enum class SnakeSteer{FORWARD,LEFT,RIGHT}
-    // Current direction which the snake will attempt to steer itself
-    private var snakeSteer: SnakeSteer = SnakeSteer.FORWARD
+    // The movement paths snake can take
+    enum class MoveDirection{FORWARD,LEFT,RIGHT}
 
     init {
-        // Create mutable local variable for snake head start position
-        var startPosition: Vector2Int = headStartPosition
-
-        // Check if snake's head start position is out of world bounds
-        if (startPosition.y > worldSizeX || startPosition.y > worldSizeY){
-            // Reposition snake's head within the world bounds in the center
-            startPosition.x = worldSizeX/2
-            startPosition.y = worldSizeY/2
-        }
-
         // Initialize snake body by first placing its head and then constructing its body onto the left side
-        snakeBody = mutableListOf(startPosition)
         for(i in 0 until startLength){
-            snakeBody += Vector2Int(startPosition.x - (i+1), startPosition.y)
+            snakeBody.add(Vector2Int(headStartPosition.x - (i+1), headStartPosition.y))
         }
     }
 
-    // Gets the current state of the snake body
-    open fun getSnakeBody(): List<Vector2Int>{
+    // Gets the current state of the snake body including head
+    open fun getSnakeBody(): MutableList<Vector2Int>{
         return snakeBody
     }
 
-    // Gets the current state of the snake head
+    // Gets the current state of the snake head only
     open fun getSnakeHead(): Vector2Int{
         return snakeBody.first()
     }
 
-    // Gets the current attempted steering direction of the snake
-    open fun getSnakeSteering(): SnakeSteer{
-        return snakeSteer
-    }
 
     // Gets the current true heading of the snake if it moved forward
-    open fun getSnakeHeading(): SnakeHeading{
+    open fun getSnakeHeading(): SnakeGame.Direction{
         return snakeHeading
     }
 
-    // Moves snake towards a heading, returns true if snake has collided with itself
-    open fun moveSnake(steer: SnakeSteer): Boolean{
+    // Tries to move snake to a given direction if it is not obstructed by its own body, returns true if obstructed
+    open fun move(direction: MoveDirection): Boolean{
         var hasCollidedWithSelf: Boolean = false
-        var headPreviousPlot: Vector2Int = getSnakeHead()
-        var headNewPlot: Vector2Int = getPlotNextToHead(steer)
+        var headPositionOld: Vector2Int = getSnakeHead()
+        var headPositionNew: Vector2Int = getPlotPositionOnSnakePath(direction)
 
 
 
         // Check whether snake would collide with itself if it moved to this plot
-        hasCollidedWithSelf = checkPlotNextToHead(steer)
+        hasCollidedWithSelf = snakePathIsObstructed(direction)
 
         // Physically move the snake if it hasn't collided with itself
         if (!hasCollidedWithSelf){
-            moveSnakeToPlot(headNewPlot)
+
+            // Move the snake
+            moveSnakeToPlot(headPositionNew)
+
+            // Update snake true heading
+            snakeHeading = SnakeGame.directionFromOrigin(headPositionOld,headPositionNew)
+
+            return hasCollidedWithSelf
+        }
+        else{
+
+            Log.i("Snake","The snake has collided with itself, and thus cannot move to this direction!")
+            return hasCollidedWithSelf
         }
 
-        // Debug
-        println(hasCollidedWithSelf)
-        println("true plot: " + getSnakeHead().x + " " + getSnakeHead().y)
-        println("new plot: " + headNewPlot.x + " " + headNewPlot.y)
-        println("old plot: " + headPreviousPlot.x + " " + headNewPlot.y)
 
-        // Reset snake steering back to forward
-        snakeSteer = SnakeSteer.FORWARD
-
-        // Update snake true heading
-        snakeHeading = headingFromOrigin(headPreviousPlot,headNewPlot)
-        return hasCollidedWithSelf
     }
+
 
     // Moves snakes head and its body to a plot
     private fun moveSnakeToPlot(plot: Vector2Int){
@@ -458,173 +573,73 @@ private class Snake(headStartPosition: Vector2Int, startLength: Int, worldSizeX:
 
             }
         }
+
     }
 
-    // Checks whether a snake body part occupies a plot proportional to the snake's head's heading and given steering direction
+
+
+    // Gets the adjacent plot position proportional to the snake's head's heading and given move direction
+    private fun getPlotPositionOnSnakePath(direction: MoveDirection):Vector2Int{
+        when(snakeHeading){
+            SnakeGame.Direction.UP -> {
+                return when(direction){
+                    MoveDirection.FORWARD -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.UP)
+                    MoveDirection.LEFT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.LEFT)
+                    MoveDirection.RIGHT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.RIGHT)
+                }
+            }
+            SnakeGame.Direction.DOWN -> {
+                return when(direction){
+                    MoveDirection.FORWARD -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.DOWN)
+                    MoveDirection.LEFT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.RIGHT)
+                    MoveDirection.RIGHT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.LEFT)
+                }
+            }
+            SnakeGame.Direction.LEFT -> {
+                return when(direction){
+                    MoveDirection.FORWARD -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.LEFT)
+                    MoveDirection.LEFT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.DOWN)
+                    MoveDirection.RIGHT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.UP)
+                }
+            }
+            SnakeGame.Direction.RIGHT -> {
+                return when(direction){
+                    MoveDirection.FORWARD -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.RIGHT)
+                    MoveDirection.LEFT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.UP)
+                    MoveDirection.RIGHT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.DOWN)
+                }
+            }
+        }
+    }
+
+    // Checks whether a snake body part occupies a plot on one of the snake's possible paths
     // Returns true if occupied
-    private fun checkPlotNextToHead(steer: SnakeSteer):Boolean{
-        when(snakeHeading){
-            SnakeHeading.UP -> {
-                return when(steer){
-                    SnakeSteer.FORWARD -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.UP)
-                    SnakeSteer.LEFT -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.LEFT)
-                    SnakeSteer.RIGHT -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.RIGHT)
-                }
-            }
-            SnakeHeading.DOWN -> {
-                return when(steer){
-                    SnakeSteer.FORWARD -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.DOWN)
-                    SnakeSteer.LEFT -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.RIGHT)
-                    SnakeSteer.RIGHT -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.LEFT)
-                }
-            }
-            SnakeHeading.LEFT -> {
-                return when(steer){
-                    SnakeSteer.FORWARD -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.LEFT)
-                    SnakeSteer.LEFT -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.DOWN)
-                    SnakeSteer.RIGHT -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.UP)
-                }
-            }
-            SnakeHeading.RIGHT -> {
-                return when(steer){
-                    SnakeSteer.FORWARD -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.RIGHT)
-                    SnakeSteer.LEFT -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.UP)
-                    SnakeSteer.RIGHT -> checkAdjacentPlot(getSnakeHead(),SnakeHeading.DOWN)
-                }
-            }
-        }
-    }
-
-    // Gets the adjacent plot proportional to the snake's head's heading and given steering direction
-    private fun getPlotNextToHead(steer: SnakeSteer):Vector2Int{
-        when(snakeHeading){
-            SnakeHeading.UP -> {
-                return when(steer){
-                    SnakeSteer.FORWARD -> getAdjacentPlot(getSnakeHead(),SnakeHeading.UP)
-                    SnakeSteer.LEFT -> getAdjacentPlot(getSnakeHead(),SnakeHeading.LEFT)
-                    SnakeSteer.RIGHT -> getAdjacentPlot(getSnakeHead(),SnakeHeading.RIGHT)
-                }
-            }
-            SnakeHeading.DOWN -> {
-                return when(steer){
-                    SnakeSteer.FORWARD -> getAdjacentPlot(getSnakeHead(),SnakeHeading.DOWN)
-                    SnakeSteer.LEFT -> getAdjacentPlot(getSnakeHead(),SnakeHeading.RIGHT)
-                    SnakeSteer.RIGHT -> getAdjacentPlot(getSnakeHead(),SnakeHeading.LEFT)
-                }
-            }
-            SnakeHeading.LEFT -> {
-                return when(steer){
-                    SnakeSteer.FORWARD -> getAdjacentPlot(getSnakeHead(),SnakeHeading.LEFT)
-                    SnakeSteer.LEFT -> getAdjacentPlot(getSnakeHead(),SnakeHeading.DOWN)
-                    SnakeSteer.RIGHT -> getAdjacentPlot(getSnakeHead(),SnakeHeading.UP)
-                }
-            }
-            SnakeHeading.RIGHT -> {
-                return when(steer){
-                    SnakeSteer.FORWARD -> getAdjacentPlot(getSnakeHead(),SnakeHeading.RIGHT)
-                    SnakeSteer.LEFT -> getAdjacentPlot(getSnakeHead(),SnakeHeading.UP)
-                    SnakeSteer.RIGHT -> getAdjacentPlot(getSnakeHead(),SnakeHeading.DOWN)
-                }
-            }
-        }
-    }
-
-
-    // Checks whether given plot is occupied by a snake body part, returns true if occupied
-    private fun checkPlot(plot: Vector2Int): Boolean{
+    private fun snakePathIsObstructed(direction: MoveDirection):Boolean{
+        val plotToCheck: Vector2Int = getPlotPositionOnSnakePath(direction)
         getSnakeBody().forEach(){
-            if (it == plot){return true}
+            if (it.x == plotToCheck.x && it.y == plotToCheck.y){ return true }
         }
         return false
+
     }
 
-    // Checks whether given blocks given direction is occupied, returns true if occupied
-    private fun checkAdjacentPlot(plot: Vector2Int, direction: SnakeHeading):Boolean{
-        var adjacentPlot: Vector2Int = Vector2Int(0,0) // Initialize variable
-        when(direction){
-            SnakeHeading.UP -> {
-                adjacentPlot.x = plot.x
-                adjacentPlot.y = plot.y + 1
-            }
-            SnakeHeading.DOWN -> {
-                adjacentPlot.x = plot.x
-                adjacentPlot.y = plot.y - 1
-            }
-            SnakeHeading.LEFT -> {
-                adjacentPlot.x = plot.x - 1
-                adjacentPlot.y = plot.y
-            }
-            SnakeHeading.RIGHT -> {
-                adjacentPlot.x = plot.x + 1
-                adjacentPlot.y = plot.y
-            }
-        }
 
-        return checkPlot(adjacentPlot)
-    }
+ // Legacy -----------------------------------------------------------------------------------------
 
-    // Gets the position of a plot adjacent the the given origin and given heading
-    private fun getAdjacentPlot(plot: Vector2Int, direction: SnakeHeading): Vector2Int{
-        var adjacentPlot: Vector2Int = Vector2Int(0,0) // Initialize variable
+    // Checks whether given plot is occupied by a snake body part, returns true if occupied
+    //private fun checkPlot(plot: Vector2Int): Boolean{
+   //  getSnakeBody().forEach(){
+     //    if (it == plot){return true}
+     //}
+     //return false
+ }
 
-        when(direction){
-            SnakeHeading.UP -> {
-                adjacentPlot.x = plot.x
-                adjacentPlot.y = plot.y + 1
-            }
-            SnakeHeading.DOWN -> {
-                adjacentPlot.x = plot.x
-                adjacentPlot.y = plot.y - 1
-            }
-            SnakeHeading.LEFT -> {
-                adjacentPlot.x = plot.x - 1
-                adjacentPlot.y = plot.y
-            }
-            SnakeHeading.RIGHT -> {
-                adjacentPlot.x = plot.x + 1
-                adjacentPlot.y = plot.y
-            }
-        }
 
-        return adjacentPlot
-    }
-
-    // Checks from origin that in which proportional direction does a destination reside
-    private fun headingFromOrigin(origin: Vector2Int, destination: Vector2Int): SnakeHeading{
-        var dominantHeading: SnakeHeading // Initialize local variable
-
-        var longestMagnitude: Int = 0
-        val posXMag: Int = destination.x - origin.x
-        val negXMag: Int = origin.x - destination.x
-        val posYMag: Int = destination.y - origin.y
-        val negYMag: Int = origin.y - destination.y
-
-        // Check positive X magnitude (initial)
-        longestMagnitude = posXMag
-        dominantHeading = SnakeHeading.RIGHT
-
-        // Check negative X magnitude
-        if (longestMagnitude < negXMag){
-            longestMagnitude = negXMag
-            dominantHeading = SnakeHeading.LEFT
-        }
-
-        // Check positive Y magnitude
-        if (longestMagnitude < posYMag){
-            longestMagnitude = posYMag
-            dominantHeading = SnakeHeading.UP
-        }
-
-        // Check negative Y magnitude
-        if (longestMagnitude < negYMag){
-            longestMagnitude = negYMag
-            dominantHeading = SnakeHeading.DOWN
-        }
-
-        return dominantHeading
-    }
+// Class for handling the snakes food
+private class Food(){
 
 }
+
 
 
 // 2 dimensional class representation of a vector presented in integers
