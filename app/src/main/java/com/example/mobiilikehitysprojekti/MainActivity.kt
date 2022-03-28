@@ -1,5 +1,6 @@
 package com.example.mobiilikehitysprojekti
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -26,13 +28,13 @@ class MainActivity : AppCompatActivity() {
     //Authentication
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
+
+    //Error logging tag
     private companion object{
         private const val TAG = "GOOGLE_SIGN_IN_TAG"
     }
 
-    val Req_Code:Int=123
-
-    //Declaring stuff needed for sidebar
+    //Things needed for sidebar
     private lateinit var actionBarToggle: ActionBarDrawerToggle
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
@@ -57,10 +59,11 @@ class MainActivity : AppCompatActivity() {
         val headerView: View = navigationView.getHeaderView(0)
         val signInButton: Button = headerView.findViewById(R.id.btnLogIn)
         signInButton.setOnClickListener {
-            signInGoogle()
+            val signInIntent:Intent = googleSignInClient.signInIntent
+            signInGoogle.launch(signInIntent)
         }
 
-        //Initializing game cardviews
+        //Initializing game cardview buttons
         val matopeliCard: View = findViewById(R.id.mcvMatopeli)
         matopeliCard.setOnClickListener(gameClick)
         val tetrisCard: View = findViewById(R.id.mcvTetris)
@@ -103,15 +106,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     //Beginning google sign in
-    private  fun signInGoogle(){
-        val signInIntent:Intent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, Req_Code)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode==Req_Code){
-            val task:Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+    private var signInGoogle = registerForActivityResult (
+        ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task:Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             handleResult(task)
         }
     }
@@ -149,12 +147,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //Listener for clicking games
+    //Listener for clicking game buttons
     private val gameClick: View.OnClickListener = View.OnClickListener { view ->
         when (view.id) {
             R.id.mcvMatopeli -> {
-                //Placeholder
-                Toast.makeText(this, "Matopeli", Toast.LENGTH_SHORT).show()
+
             }
             R.id.mcvTetris -> {
                 //Placeholder

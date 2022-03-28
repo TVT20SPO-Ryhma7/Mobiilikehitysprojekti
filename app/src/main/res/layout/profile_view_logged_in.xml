@@ -15,7 +15,6 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/llUserInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -33,7 +32,8 @@
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:contentDescription="@string/avatar"
-                    android:src="@color/teal_200" />
+                    android:background="@color/grey_400"
+                    android:src="@drawable/ic_baseline_person_24" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -41,9 +41,8 @@
                 android:id="@+id/tvUserInfo"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
-                android:background="@color/teal_200"
-                android:gravity="center"
-                android:text="User info"
+                android:paddingHorizontal="5dp"
+                android:background="@color/grey_400"
                 android:textColor="@color/black"
                 android:textSize="25sp" />
 
@@ -53,7 +52,7 @@
             android:id="@+id/btnLeaderboards"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
-            android:backgroundTint="@color/teal_200"
+            android:backgroundTint="@color/grey_400"
             android:text="@string/view_all_leaderboards"
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"

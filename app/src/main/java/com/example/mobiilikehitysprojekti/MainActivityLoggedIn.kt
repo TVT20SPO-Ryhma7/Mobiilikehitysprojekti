@@ -18,12 +18,13 @@ import com.google.firebase.auth.FirebaseAuth
 
 class MainActivityLoggedIn : AppCompatActivity() {
 
+    //Authentication
     private lateinit var googleSignInClient: GoogleSignInClient
     private val firebaseAuth by lazy {
         FirebaseAuth.getInstance()
     }
 
-    //Declaring stuff needed for sidedrawer
+    //Things needed for sidebar
     private lateinit var actionBarToggle: ActionBarDrawerToggle
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
@@ -32,6 +33,7 @@ class MainActivityLoggedIn : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_logged_in)
 
+        //Configuring the google sign-out
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.def_web_client_id))
             .requestEmail()
@@ -39,6 +41,7 @@ class MainActivityLoggedIn : AppCompatActivity() {
 
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
 
+        //Sign out button in sidebar
         navigationView = findViewById(R.id.navigationViewLoggedIn)
         val headerView: View = navigationView.getHeaderView(0)
         val signOutButton: Button = headerView.findViewById(R.id.btnLogOut)
@@ -50,11 +53,13 @@ class MainActivityLoggedIn : AppCompatActivity() {
             }
         }
 
-        //Displaying user info
+        //Displaying user info in main menu and sidebar
         val textViewUserName: TextView = headerView.findViewById(R.id.tvUserName)
         textViewUserName.text = firebaseAuth.currentUser!!.displayName
+        val textViewUserInfo: TextView = findViewById(R.id.tvUserInfo)
+        textViewUserInfo.text = firebaseAuth.currentUser!!.displayName
 
-        //Initializing game cardviews
+        //Initializing game cardview buttons
         val matopeliCard: View = findViewById(R.id.mcvMatopeli)
         matopeliCard.setOnClickListener(gameClick)
         val tetrisCard: View = findViewById(R.id.mcvTetris)
@@ -96,12 +101,13 @@ class MainActivityLoggedIn : AppCompatActivity() {
         }
     }
 
-    //Listener for clicking games
+    //Listener for clicking game buttons
     private val gameClick: View.OnClickListener = View.OnClickListener { view ->
         when (view.id) {
             R.id.mcvMatopeli -> {
-                //Placeholder
-                Toast.makeText(this, "Matopeli", Toast.LENGTH_SHORT).show()
+                // Creates new intent and loads 'GameSnake' activity
+                //val snakeIntent: Intent = Intent(this,GameSnake::class.java)
+                //this.startActivity(snakeIntent)
             }
             R.id.mcvTetris -> {
                 //Placeholder
