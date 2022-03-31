@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import java.util.*
+import kotlin.random.Random
 
 // Snake game activity class
 class GameSnake : AppCompatActivity() {
@@ -42,7 +43,7 @@ class GameSnake : AppCompatActivity() {
     private var snakeStartLength: Int = 5   // Max safe start length is 4
 
     // This 2D array represents the 'game board' (made of 'plots') of which the snake and its food move around
-    private var snakeGame: SnakeGame = SnakeGame(gameDimensionX,gameDimensionY,snakeStartLength)
+    private var gameSnakeEngine: GameSnakeEngine = GameSnakeEngine(gameDimensionX,gameDimensionY,snakeStartLength)
 
 
 
@@ -119,7 +120,7 @@ class GameSnake : AppCompatActivity() {
             }
         }, 0, gameLogicInterval)
 
-        snakeGame.newGame()
+        gameSnakeEngine.newGame()
 
         isStarted = true
     }
@@ -158,7 +159,7 @@ class GameSnake : AppCompatActivity() {
 
     // Gets called in regular intervals to advance game state
     private fun onGameTick() {
-        Log.i("GameTick", "Tick: ${snakeGame.currentTick}")
+        Log.i("Game", "Tick: ${gameSnakeEngine.currentTick}")
         handleGameLogic()
 
         // Update view on the user's device
@@ -171,15 +172,15 @@ class GameSnake : AppCompatActivity() {
         // Handle input
         when(nextInput){
             GameInput.NONE -> {}
-            GameInput.LEFT -> snakeGame.snakeStageMoveLeft()
-            GameInput.RIGHT -> snakeGame.snakeStageMoveRight()
-            GameInput.UP -> snakeGame.snakeStageMoveUp()
-            GameInput.DOWN -> snakeGame.snakeStageMoveDown()
+            GameInput.LEFT -> gameSnakeEngine.snakeStageMoveLeft()
+            GameInput.RIGHT -> gameSnakeEngine.snakeStageMoveRight()
+            GameInput.UP -> gameSnakeEngine.snakeStageMoveUp()
+            GameInput.DOWN -> gameSnakeEngine.snakeStageMoveDown()
 
         }
 
         // Advance game state
-        snakeGame.next()
+        gameSnakeEngine.next()
 
         // Reset next input
         nextInput = GameInput.NONE
@@ -192,21 +193,21 @@ class GameSnake : AppCompatActivity() {
             Bitmap.createBitmap(gameDimensionX, gameDimensionY, Bitmap.Config.ARGB_8888)
 
         // Iterates all values from game state and set corresponding pixels
-        for (x in 0 until snakeGame.getState().size - 1) {
-            for (y in 0 until snakeGame.getState()[0].size - 1) {
+        for (x in 0 until gameSnakeEngine.getState().size - 1) {
+            for (y in 0 until gameSnakeEngine.getState()[0].size - 1) {
 
                 // If plot is empty (0)
-                if (snakeGame.getState()[x][y] == 0) {
+                if (gameSnakeEngine.getState()[x][y] == 0) {
                     renderedView.setPixel(x, y, Color.WHITE)
                 }
 
                 // If plot is occupied by snake (1)
-                else if (snakeGame.getState()[x][y] == 1) {
+                else if (gameSnakeEngine.getState()[x][y] == 1) {
                     renderedView.setPixel(x, y, Color.BLACK)
                 }
 
                 // If plot is occupied by food (2)
-                else if (snakeGame.getState()[x][y] == 2) {
+                else if (gameSnakeEngine.getState()[x][y] == 2) {
                     renderedView.setPixel(x, y, Color.RED)
                 }
 
@@ -226,7 +227,7 @@ class GameSnake : AppCompatActivity() {
 }
 
 // Class to handle and keep track of current state of a snake game
-private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
+private class GameSnakeEngine(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
 
     // Initialization ------------------------------------------------------------------------------
 
@@ -249,7 +250,11 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
         //if (startLength > 4){startLength = 4}
     }
 
+    // Game Related --------------------------------------------------------------------------------
 
+    open var score: Int = 0
+    get
+    private set
 
 
     // State Related -------------------------------------------------------------------------------
@@ -265,6 +270,9 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
 
     // Automatically create a new snake with its head starting position in the center of the world
     private var snake: Snake = Snake(Vector2Int(sizeX/2,sizeY/2), startLength)
+
+    // Creates new instance for food
+    private var food: Food = Food()
 
 
     // Staged Variables ----------------------------------------------------------------------------
@@ -282,13 +290,34 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
     // Applies staged changes to current game state cycle and
     // Should be called once per tick to advance the game!
     open fun next(){
+        var gameOver: Boolean = false
 
         // Move snake according to proposed changes
-        snake.move(stagedSnakeNextMoveDirection)
+        gameOver = snake.move(stagedSnakeNextMoveDirection)
 
         // Reset proposed change variables
         stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
 
+        // Check whether snake has gone outside the bounds
+        if ( snake.getSnakeHead().x > sizeX - 1 || snake.getSnakeHead().y > sizeY - 1
+            || snake.getSnakeHead().x < 0 || snake.getSnakeHead().y  < 0 )
+        {
+            gameOver = true
+        }
+
+        // If game over conditions have been met
+        if (gameOver){
+            Log.i("Game", "Game Over! Your score was: $score")
+            newGame()
+        }
+
+        // Check if snake ate food
+        if(snake.getSnakeHead().x == food.position.x && snake.getSnakeHead().y == food.position.y){
+            snake.expand(1)
+            food.spawnNewFood(sizeX,sizeY,snake.getSnakeBody().toTypedArray())
+            score++
+            Log.i("Game", "Food eaten! Current score is: $score")
+        }
 
 
 
@@ -301,7 +330,9 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
         }
 
         // Add food to state
-
+        if (food.exists){
+            setPlot(2,food.position.x,food.position.y)
+        }
 
         currentTick++
     }
@@ -309,7 +340,7 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
     // Sets single plot in the game state to a given value
     private fun setPlot(value: Int, x: Int, y: Int){
         // If given plot exists outside of world bounds, return
-        if ( x >sizeX || y>sizeY || sizeX < 0 || sizeY< 0 ) {return}
+        if ( x > sizeX - 1 || y > sizeY - 1 || x < 0 || y  < 0 ) {return}
 
         gameState[x][y] = value
     }
@@ -334,6 +365,7 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
 
     // Sets current game state to a default beginning of a new game of snake
     open fun newGame(){
+        score = 0
 
         // Set all values to 0
         for (x in 0 until gameState.size - 1) {
@@ -347,7 +379,7 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
         snake = Snake(Vector2Int(sizeX/2,sizeY/2), startLength)
 
         // Place starting snake food
-        // TODO
+        food.spawnNewFood(sizeX,sizeY,snake.getSnakeBody().toTypedArray())
 
     }
 
@@ -367,40 +399,40 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
     // Attempts to move if possible snake's head and its following body to this direction from snake heading
     open fun snakeStageMoveUp(){
         when(snake.getSnakeHeading()){
-            SnakeGame.Direction.UP -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
-            SnakeGame.Direction.DOWN -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
-            SnakeGame.Direction.LEFT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.RIGHT
-            SnakeGame.Direction.RIGHT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.LEFT
+            GameSnakeEngine.Direction.UP -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            GameSnakeEngine.Direction.DOWN -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            GameSnakeEngine.Direction.LEFT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.RIGHT
+            GameSnakeEngine.Direction.RIGHT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.LEFT
         }
     }
 
     // Attempts to move if possible snake's head and its following body to this direction from snake heading
     open fun snakeStageMoveDown(){
         when(snake.getSnakeHeading()){
-            SnakeGame.Direction.UP -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
-            SnakeGame.Direction.DOWN -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
-            SnakeGame.Direction.LEFT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.LEFT
-            SnakeGame.Direction.RIGHT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.RIGHT
+            GameSnakeEngine.Direction.UP -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            GameSnakeEngine.Direction.DOWN -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            GameSnakeEngine.Direction.LEFT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.LEFT
+            GameSnakeEngine.Direction.RIGHT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.RIGHT
         }
     }
 
     // Attempts to move if possible snake's head and its following body to this direction from snake heading
     open fun snakeStageMoveLeft(){
         when(snake.getSnakeHeading()){
-            SnakeGame.Direction.UP -> stagedSnakeNextMoveDirection = Snake.MoveDirection.LEFT
-            SnakeGame.Direction.DOWN -> stagedSnakeNextMoveDirection = Snake.MoveDirection.RIGHT
-            SnakeGame.Direction.LEFT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
-            SnakeGame.Direction.RIGHT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            GameSnakeEngine.Direction.UP -> stagedSnakeNextMoveDirection = Snake.MoveDirection.LEFT
+            GameSnakeEngine.Direction.DOWN -> stagedSnakeNextMoveDirection = Snake.MoveDirection.RIGHT
+            GameSnakeEngine.Direction.LEFT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            GameSnakeEngine.Direction.RIGHT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
         }
     }
 
     // Attempts to move if possible snake's head and its following body to this direction from snake heading
-    open fun snakeStageMoveRight(){
-        when(snake.getSnakeHeading()){
-            SnakeGame.Direction.UP -> snake.move(Snake.MoveDirection.RIGHT)
-            SnakeGame.Direction.DOWN -> snake.move(Snake.MoveDirection.LEFT)
-            SnakeGame.Direction.LEFT -> snake.move(Snake.MoveDirection.FORWARD)
-            SnakeGame.Direction.RIGHT -> snake.move(Snake.MoveDirection.FORWARD)
+    open fun snakeStageMoveRight() {
+        when (snake.getSnakeHeading()) {
+            GameSnakeEngine.Direction.UP -> stagedSnakeNextMoveDirection = Snake.MoveDirection.RIGHT
+            GameSnakeEngine.Direction.DOWN -> stagedSnakeNextMoveDirection = Snake.MoveDirection.LEFT
+            GameSnakeEngine.Direction.LEFT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
+            GameSnakeEngine.Direction.RIGHT -> stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
         }
     }
 
@@ -408,7 +440,7 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
     // Helper --------------------------------------------------------------------------------------
 
     // Returns the value of an adjacent block
-    private fun checkAdjacentPlotValue(plot: Vector2Int, direction: SnakeGame.Direction):Int{
+    private fun checkAdjacentPlotValue(plot: Vector2Int, direction: GameSnakeEngine.Direction):Int{
         var adjacentPlot: Vector2Int = getAdjacentPlotPosition(plot,direction)
         return gameState[adjacentPlot.x][adjacentPlot.y]
     }
@@ -418,23 +450,23 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
     companion object{
 
         // Gets the position of a plot adjacent the the given origin and given direction
-        open fun getAdjacentPlotPosition(plot: Vector2Int, direction: SnakeGame.Direction): Vector2Int{
+        open fun getAdjacentPlotPosition(plot: Vector2Int, direction: GameSnakeEngine.Direction): Vector2Int{
             var adjacentPlot: Vector2Int = Vector2Int(0,0) // Initialize variable
 
             when(direction){
-                SnakeGame.Direction.UP -> {
+                GameSnakeEngine.Direction.UP -> {
                     adjacentPlot.x = plot.x
                     adjacentPlot.y = plot.y - 1
                 }
-                SnakeGame.Direction.DOWN -> {
+                GameSnakeEngine.Direction.DOWN -> {
                     adjacentPlot.x = plot.x
                     adjacentPlot.y = plot.y + 1
                 }
-                SnakeGame.Direction.LEFT -> {
+                GameSnakeEngine.Direction.LEFT -> {
                     adjacentPlot.x = plot.x - 1
                     adjacentPlot.y = plot.y
                 }
-                SnakeGame.Direction.RIGHT -> {
+                GameSnakeEngine.Direction.RIGHT -> {
                     adjacentPlot.x = plot.x + 1
                     adjacentPlot.y = plot.y
                 }
@@ -443,8 +475,8 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
         }
 
         // Checks from origin that in which proportional direction does a destination reside
-        open fun directionFromOrigin(origin: Vector2Int, destination: Vector2Int): SnakeGame.Direction{
-            var dominantDirection: SnakeGame.Direction // Initialize local variable
+        open fun directionFromOrigin(origin: Vector2Int, destination: Vector2Int): GameSnakeEngine.Direction{
+            var dominantDirection: GameSnakeEngine.Direction // Initialize local variable
 
             var longestMagnitude: Int = 0
             val posXMag: Int = destination.x - origin.x
@@ -454,25 +486,25 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
 
             // Check positive X magnitude (initial)
             longestMagnitude = posXMag
-            dominantDirection = SnakeGame.Direction.RIGHT
+            dominantDirection = GameSnakeEngine.Direction.RIGHT
 
             // Check negative X magnitude
             if (longestMagnitude < negXMag){
                 longestMagnitude = negXMag
-                dominantDirection = SnakeGame.Direction.LEFT
+                dominantDirection = GameSnakeEngine.Direction.LEFT
             }
 
             // Check positive Y magnitude
             if (longestMagnitude < posYMag){
                 longestMagnitude = posYMag
-                dominantDirection = SnakeGame.Direction.DOWN
+                dominantDirection = GameSnakeEngine.Direction.DOWN
             }
 
             // Check negative Y magnitude
             if (longestMagnitude < negYMag){
                 longestMagnitude = negYMag
                 longestMagnitude = negYMag
-                dominantDirection = SnakeGame.Direction.UP
+                dominantDirection = GameSnakeEngine.Direction.UP
             }
 
             return dominantDirection
@@ -488,11 +520,19 @@ private class SnakeGame(gameSizeX: Int, gameSizeY: Int, snakeStartLength: Int){
 // Class to keep track of the snake's position
 private class Snake(headStartPosition: Vector2Int, startLength: Int){
 
+    // Current length of the snake
+    var length: Int = 0
+    get
+    private set
+
+    // The amount of times the snake should expand itself by the tail when it moves
+    private var expandBy: Int = 0
+
     // Stores the coordinate values of the snakes body, array index 0 is the snakes head
     private var snakeBody: MutableList<Vector2Int> = mutableListOf(headStartPosition)
 
     // Current true direction of which the snake is moving if it headed forward
-    private var snakeHeading: SnakeGame.Direction = SnakeGame.Direction.RIGHT
+    private var headingSnakeEngine: GameSnakeEngine.Direction = GameSnakeEngine.Direction.RIGHT
 
     // The movement paths snake can take
     enum class MoveDirection{FORWARD,LEFT,RIGHT}
@@ -502,6 +542,7 @@ private class Snake(headStartPosition: Vector2Int, startLength: Int){
         for(i in 0 until startLength){
             snakeBody.add(Vector2Int(headStartPosition.x - (i+1), headStartPosition.y))
         }
+        length = snakeBody.size
     }
 
     // Gets the current state of the snake body including head
@@ -516,8 +557,13 @@ private class Snake(headStartPosition: Vector2Int, startLength: Int){
 
 
     // Gets the current true heading of the snake if it moved forward
-    open fun getSnakeHeading(): SnakeGame.Direction{
-        return snakeHeading
+    open fun getSnakeHeading(): GameSnakeEngine.Direction{
+        return headingSnakeEngine
+    }
+
+    // Adds new piece to the snake next time it moves
+    open fun expand(amount: Int){
+        expandBy += amount
     }
 
     // Tries to move snake to a given direction if it is not obstructed by its own body, returns true if obstructed
@@ -538,7 +584,7 @@ private class Snake(headStartPosition: Vector2Int, startLength: Int){
             moveSnakeToPlot(headPositionNew)
 
             // Update snake true heading
-            snakeHeading = SnakeGame.directionFromOrigin(headPositionOld,headPositionNew)
+            headingSnakeEngine = GameSnakeEngine.directionFromOrigin(headPositionOld,headPositionNew)
 
             return hasCollidedWithSelf
         }
@@ -552,7 +598,7 @@ private class Snake(headStartPosition: Vector2Int, startLength: Int){
     }
 
 
-    // Moves snakes head and its body to a plot
+    // Moves snakes head and its body to a plot, add new snake pieces to the end if requested
     private fun moveSnakeToPlot(plot: Vector2Int){
         var headPreviousPlot: Vector2Int = getSnakeHead()
         var headNewPlot: Vector2Int = plot
@@ -570,43 +616,49 @@ private class Snake(headStartPosition: Vector2Int, startLength: Int){
                 snakeBody[i] = bodyPartNewPlot
                 bodyPartNewPlot = cachedBodyNewPlot
 
+                // Add new snake piece if this is the last movable body part and expansion has been requested
+                if (expandBy > 0 && snakeBody[i] == getSnakeBody().last()){
+                    snakeBody.add(Vector2Int(bodyPartNewPlot.x,bodyPartNewPlot.y))
+                    expandBy--
+                }
 
             }
         }
-
+        // Update length variable
+        length = snakeBody.size
     }
 
 
 
     // Gets the adjacent plot position proportional to the snake's head's heading and given move direction
     private fun getPlotPositionOnSnakePath(direction: MoveDirection):Vector2Int{
-        when(snakeHeading){
-            SnakeGame.Direction.UP -> {
+        when(headingSnakeEngine){
+            GameSnakeEngine.Direction.UP -> {
                 return when(direction){
-                    MoveDirection.FORWARD -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.UP)
-                    MoveDirection.LEFT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.LEFT)
-                    MoveDirection.RIGHT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.RIGHT)
+                    MoveDirection.FORWARD -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.UP)
+                    MoveDirection.LEFT -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.LEFT)
+                    MoveDirection.RIGHT -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.RIGHT)
                 }
             }
-            SnakeGame.Direction.DOWN -> {
+            GameSnakeEngine.Direction.DOWN -> {
                 return when(direction){
-                    MoveDirection.FORWARD -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.DOWN)
-                    MoveDirection.LEFT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.RIGHT)
-                    MoveDirection.RIGHT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.LEFT)
+                    MoveDirection.FORWARD -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.DOWN)
+                    MoveDirection.LEFT -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.RIGHT)
+                    MoveDirection.RIGHT -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.LEFT)
                 }
             }
-            SnakeGame.Direction.LEFT -> {
+            GameSnakeEngine.Direction.LEFT -> {
                 return when(direction){
-                    MoveDirection.FORWARD -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.LEFT)
-                    MoveDirection.LEFT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.DOWN)
-                    MoveDirection.RIGHT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.UP)
+                    MoveDirection.FORWARD -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.LEFT)
+                    MoveDirection.LEFT -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.DOWN)
+                    MoveDirection.RIGHT -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.UP)
                 }
             }
-            SnakeGame.Direction.RIGHT -> {
+            GameSnakeEngine.Direction.RIGHT -> {
                 return when(direction){
-                    MoveDirection.FORWARD -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.RIGHT)
-                    MoveDirection.LEFT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.UP)
-                    MoveDirection.RIGHT -> SnakeGame.getAdjacentPlotPosition(getSnakeHead(),SnakeGame.Direction.DOWN)
+                    MoveDirection.FORWARD -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.RIGHT)
+                    MoveDirection.LEFT -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.UP)
+                    MoveDirection.RIGHT -> GameSnakeEngine.getAdjacentPlotPosition(getSnakeHead(),GameSnakeEngine.Direction.DOWN)
                 }
             }
         }
@@ -638,6 +690,43 @@ private class Snake(headStartPosition: Vector2Int, startLength: Int){
 // Class for handling the snakes food
 private class Food(){
 
+    open var exists: Boolean = false
+    open var position: Vector2Int = Vector2Int.zero
+
+
+
+    // Spawns a new piece of food with given world constrains
+    open fun spawnNewFood(maxWorldBoundX: Int, maxWorldBoundY: Int, obstructedPlots: Array<Vector2Int>?){
+
+        // Generate a list of vacant plots based on given constraints and obstructions
+        val vacantPlots: MutableList<Vector2Int> = mutableListOf()
+        for (x in 0 until maxWorldBoundX){
+            for (y in 0 until maxWorldBoundY){
+                if (obstructedPlots != null){
+                    var isObstructed: Boolean = false
+                        obstructedPlots.forEach {
+                            if (x == it.x && y == it.y){
+                                isObstructed = true
+                                return@forEach
+                            }
+                    }
+                    if (!isObstructed){
+                        vacantPlots.add(Vector2Int(x,y))
+                    }
+                }
+                else{
+                    vacantPlots.add(Vector2Int(x,y))
+                }
+            }
+        }
+
+        // Select random vacant spot from the list
+        var newFoodPosition = vacantPlots[Random.nextInt(vacantPlots.size)]
+        position = newFoodPosition
+        exists = true
+
+        Log.i("Food", "New food spawned at: (" + position.x + "," + position.y + ").")
+    }
 }
 
 
@@ -647,5 +736,13 @@ private class Vector2Int(valueX: Int, valueY: Int){
 
     open var x: Int = valueX
     open var y: Int = valueY
+
+    companion object{
+
+        open var zero: Vector2Int = Vector2Int(0,0)
+            get(){return Vector2Int(0,0) }
+    }
+
+
 
 }
