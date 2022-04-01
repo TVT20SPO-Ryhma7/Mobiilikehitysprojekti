@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
@@ -28,6 +29,9 @@ class MainActivity : AppCompatActivity() {
     //Authentication
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
+
+    //Database
+    private lateinit var firebaseFirestore: FirebaseFirestore
 
     //Error logging tag
     private companion object{
@@ -43,22 +47,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //Configuring the google sign-in
+        //Configuring the options for google sign-in
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.def_web_client_id))
             .requestEmail()
             .build()
 
+        //Initializing google sign in client
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
 
         //Initializing firebase authentication
         firebaseAuth = FirebaseAuth.getInstance()
+
+        //Initializing firestore database
+        firebaseFirestore = FirebaseFirestore.getInstance()
 
         //Sign in button in sidebar
         navigationView = findViewById(R.id.navigationViewLoggedOut)
         val headerView: View = navigationView.getHeaderView(0)
         val signInButton: Button = headerView.findViewById(R.id.btnLogIn)
         signInButton.setOnClickListener {
+            //Starting sign in intent
             val signInIntent:Intent = googleSignInClient.signInIntent
             signInGoogle.launch(signInIntent)
         }
@@ -105,10 +114,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //Beginning google sign in
+    //Starting activity for google sign in
     private var signInGoogle = registerForActivityResult (
         ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
+            //Getting signed in google account and passing it to handleResult() function
             val task:Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             handleResult(task)
         }
@@ -118,9 +128,11 @@ class MainActivity : AppCompatActivity() {
     private fun handleResult(completedTask: Task<GoogleSignInAccount>) {
         try {
             val account: GoogleSignInAccount? = completedTask.getResult(ApiException::class.java)
+            //If task returns account object passing it to firebaseAuthWithGoogleAccount() function
             if (account != null) {
                 firebaseAuthWithGoogleAccount(account)
             }
+        //Logging error message
         } catch (e: Exception){
             Log.d(TAG, "onActivityResult: ${e.message}")
         }
@@ -128,9 +140,24 @@ class MainActivity : AppCompatActivity() {
 
     //Authenticating user to firebase with google user
     private fun firebaseAuthWithGoogleAccount(account: GoogleSignInAccount){
+        //Getting a credential with google account id token
         val credential= GoogleAuthProvider.getCredential(account.idToken,null)
+        //Using the credential to sign the account in to firebase
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task->
             if(task.isSuccessful) {
+                //Checking if user is new or already registered
+                if (task.result.additionalUserInfo!!.isNewUser) {
+                    //Creating a document with user id in firestore and initializing points to 0
+                    firebaseFirestore
+                        .collection("Scores")
+                        .document(firebaseAuth.currentUser!!.uid)
+                        .set(hashMapOf<String, Any>(
+                            "MatopeliPts" to 0,
+                            "TetrisPts" to 0,
+                            "TriviaPts" to 0
+                        ))
+                }
+                //Starting logged in -activity
                 val intent = Intent(this, MainActivityLoggedIn::class.java)
                 startActivity(intent)
                 finish()
@@ -141,7 +168,9 @@ class MainActivity : AppCompatActivity() {
     //Signing in automatically when starting the app
     override fun onStart() {
         super.onStart()
+        //Looking for an account that was signed in last with this device
         if (GoogleSignIn.getLastSignedInAccount(this) != null) {
+            //Starting logged in -activity
             startActivity(Intent(this, MainActivityLoggedIn::class.java))
             finish()
         }
