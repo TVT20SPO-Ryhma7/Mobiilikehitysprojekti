@@ -21,10 +21,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 class MainActivityLoggedIn : AppCompatActivity() {
 
     //Authentication
+    private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
-    private val firebaseAuth by lazy { //***
-        FirebaseAuth.getInstance()
-    }
 
     //Database
     private lateinit var firebaseFirestore: FirebaseFirestore
@@ -51,6 +49,9 @@ class MainActivityLoggedIn : AppCompatActivity() {
 
         //Initializing google sign in client
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
+
+        //Initializing firebase authentication
+        firebaseAuth = FirebaseAuth.getInstance()
 
         //Initializing firestore database
         firebaseFirestore = FirebaseFirestore.getInstance()
