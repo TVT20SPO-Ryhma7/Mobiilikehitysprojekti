@@ -3,6 +3,7 @@ package com.example.mobiilikehitysprojekti
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -15,31 +16,44 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivityLoggedIn : AppCompatActivity() {
 
     //Authentication
     private lateinit var googleSignInClient: GoogleSignInClient
-    private val firebaseAuth by lazy {
+    private val firebaseAuth by lazy { //***
         FirebaseAuth.getInstance()
     }
+
+    //Database
+    private lateinit var firebaseFirestore: FirebaseFirestore
 
     //Things needed for sidebar
     private lateinit var actionBarToggle: ActionBarDrawerToggle
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
 
+    //Error logging tag
+    private companion object{
+        private const val TAG = "FIRESTORE"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_logged_in)
 
-        //Configuring the google sign-out
+        //Configuring the options for google sign-in
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.def_web_client_id))
             .requestEmail()
             .build()
 
+        //Initializing google sign in client
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
+
+        //Initializing firestore database
+        firebaseFirestore = FirebaseFirestore.getInstance()
 
         //Sign out button in sidebar
         navigationView = findViewById(R.id.navigationViewLoggedIn)
@@ -47,6 +61,7 @@ class MainActivityLoggedIn : AppCompatActivity() {
         val signOutButton: Button = headerView.findViewById(R.id.btnLogOut)
         signOutButton.setOnClickListener {
             googleSignInClient.signOut().addOnCompleteListener {
+                //Starting sign out intent
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -68,6 +83,25 @@ class MainActivityLoggedIn : AppCompatActivity() {
         triviaCard.setOnClickListener(gameClick)
         val nopeusPeliCard: View = findViewById(R.id.mcvNopeuspeli)
         nopeusPeliCard.setOnClickListener(gameClick)
+
+        //Initializing game points textviews
+        val textViewMatopeliPts: TextView = findViewById(R.id.tvMatopeliPoints)
+        val textViewTetrisPts: TextView = findViewById(R.id.tvTetrisPoints)
+        val textViewTriviaPts: TextView = findViewById(R.id.tvTriviaPoints)
+
+        //Getting currently logged in users points for each game and displaying them in game cardviews
+        firebaseFirestore.collection("Scores")
+            .document(firebaseAuth.currentUser!!.uid).get().addOnSuccessListener { document ->
+                var ptsString = document["MatopeliPts"].toString() +" "+ getString(R.string.pts)
+                textViewMatopeliPts.text = ptsString
+                ptsString = document["TetrisPts"].toString() +" "+ getString(R.string.pts)
+                textViewTetrisPts.text = ptsString
+                ptsString = document["TriviaPts"].toString() +" "+ getString(R.string.pts)
+                textViewTriviaPts.text = ptsString
+            }
+            .addOnFailureListener { e ->
+                Log.d(TAG, "Database GET failed: ", e)
+            }
 
         //Sidebar button in appbar
         setSupportActionBar(findViewById(R.id.toolbar))
@@ -114,8 +148,8 @@ class MainActivityLoggedIn : AppCompatActivity() {
                 Toast.makeText(this, "Tetris", Toast.LENGTH_SHORT).show()
             }
             R.id.mcvTrivia -> {
-                //Placeholder
-                Toast.makeText(this, "Trivia", Toast.LENGTH_SHORT).show()
+                val triviaIntent = Intent(this, GameTrivia::class.java)
+                startActivity(triviaIntent)
             }
             R.id.mcvNopeuspeli -> {
                 //Placeholder
