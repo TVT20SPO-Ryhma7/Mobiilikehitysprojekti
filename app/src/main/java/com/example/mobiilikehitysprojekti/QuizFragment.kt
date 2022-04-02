@@ -6,15 +6,45 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.findNavController
 import com.example.mobiilikehitysprojekti.databinding.FragmentQuizBinding
+import com.google.firebase.firestore.FirebaseFirestore
 
 class QuizFragment : Fragment() {
 
+    //Database
+    private lateinit var db: FirebaseFirestore
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+        // Initializing firestore database
+        db = FirebaseFirestore.getInstance()
+        val questionsList = ArrayList<Question>()
+
         val binding = DataBindingUtil.inflate<FragmentQuizBinding>(inflater,
             R.layout.fragment_quiz, container, false)
+
+        // Get category name from categoryFragment
+        setFragmentResultListener("category") { key, bundle ->
+            val categoryName = bundle.getString("name")
+
+            // Get questions from database
+            val collectionName = "${categoryName}Questions"
+            db.collection(collectionName)
+                .get()
+                .addOnSuccessListener {
+                    for (question in it) {
+                        val questionObject = question.toObject(Question::class.java)
+                        questionsList.add(questionObject)
+                    }
+                    println(questionsList)
+                }
+                .addOnFailureListener { exception ->
+                    println("Error getting questions: $exception")
+                }
+        }
 
         binding.optionOne.setOnClickListener(optionClick)
         binding.optionTwo.setOnClickListener(optionClick)
