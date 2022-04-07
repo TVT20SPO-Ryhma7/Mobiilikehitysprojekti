@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Mobiilikehitysprojekti">
         <activity
+            android:name=".GameSpeed"
+            android:exported="false" />
+        <activity
             android:name=".GameTrivia"
             android:exported="false" />
         <activity
@@ -22,7 +25,7 @@
             android:exported="true" />
         <activity
             android:name=".MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

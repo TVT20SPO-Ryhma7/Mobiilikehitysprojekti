@@ -20,4 +20,6 @@
     <string name="log_in_to_see_ranking">Log in to see ranking</string>
     <string name="view_all_leaderboards">View all leaderboards</string>
     <string name="pts">Pts</string>
+    <string name="start_the_game">Start the game</string>
+    <string name="_0">0</string>
 </resources>

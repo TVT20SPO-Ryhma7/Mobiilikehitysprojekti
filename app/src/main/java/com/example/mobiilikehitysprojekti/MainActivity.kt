@@ -154,7 +154,8 @@ class MainActivity : AppCompatActivity() {
                         .set(hashMapOf<String, Any>(
                             "MatopeliPts" to 0,
                             "TetrisPts" to 0,
-                            "TriviaPts" to 0
+                            "TriviaPts" to 0,
+                            "SpeedGamePts" to 0
                         ))
                 }
                 //Starting logged in -activity
@@ -193,8 +194,9 @@ class MainActivity : AppCompatActivity() {
                 startActivity(triviaIntent)
             }
             R.id.mcvNopeuspeli -> {
-                //Placeholder
-                Toast.makeText(this, "Nopeuspeli", Toast.LENGTH_SHORT).show()
+                // Creates new intent and loads 'GameSpeed' activity
+                val speedGameIntent = Intent(this, GameSpeed::class.java)
+                startActivity(speedGameIntent)
             }
         }
     }
