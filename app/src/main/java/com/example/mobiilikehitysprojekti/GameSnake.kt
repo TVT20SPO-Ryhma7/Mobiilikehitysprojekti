@@ -5,9 +5,13 @@ import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import org.w3c.dom.Text
+import java.security.acl.Group
 import java.util.*
 import kotlin.random.Random
 
@@ -22,6 +26,17 @@ class GameSnake : AppCompatActivity() {
     private lateinit var buttonDown: Button
     private lateinit var buttonLeft: Button
     private lateinit var buttonRight: Button
+    private lateinit var buttonTogglePause: Button
+    private lateinit var textScore: TextView
+
+    private lateinit var viewGameOverBackground: ImageView
+    private lateinit var textGameOverTitle: TextView
+    private lateinit var textGameOverScore: TextView
+    private lateinit var textGameOverReason: TextView
+    private lateinit var buttonPlayAgain: Button
+    private lateinit var groupGameOver: androidx.constraintlayout.widget.Group
+
+    private lateinit var groupGamePaused: androidx.constraintlayout.widget.Group
 
     // Game variables -----------------------
     private var isStarted: Boolean = false  // Whether game has been started with startGame function
@@ -38,8 +53,6 @@ class GameSnake : AppCompatActivity() {
     enum class GameInput{NONE,UP,DOWN,LEFT,RIGHT}
     private var nextInput: GameInput = GameInput.NONE
 
-    private var score: Int = 0
-    private var snakeLength: Int = 0
     private var snakeStartLength: Int = 5   // Max safe start length is 4
 
     // This 2D array represents the 'game board' (made of 'plots') of which the snake and its food move around
@@ -61,6 +74,15 @@ class GameSnake : AppCompatActivity() {
         buttonDown = findViewById(R.id.buttonMoveDown)
         buttonLeft = findViewById(R.id.buttonMoveLeft)
         buttonRight = findViewById(R.id.buttonMoveRight)
+        buttonTogglePause = findViewById(R.id.buttonTogglePause)
+        textScore = findViewById(R.id.textViewScore)
+        viewGameOverBackground = findViewById(R.id.imageViewEndScreenBackground)
+        textGameOverTitle = findViewById(R.id.textViewTitleGameOver)
+        textGameOverScore = findViewById(R.id.textViewGameOverScore)
+        textGameOverReason = findViewById(R.id.textViewGameOverReason)
+        buttonPlayAgain = findViewById(R.id.buttonGameOverPlayAgain)
+        groupGameOver = findViewById(R.id.groupEndScreen)
+        groupGamePaused = findViewById(R.id.groupPause)
 
         // Set button listeners
         buttonUp.setOnClickListener(){
@@ -87,11 +109,24 @@ class GameSnake : AppCompatActivity() {
 
             nextInput = GameInput.RIGHT
         }
+        buttonTogglePause.setOnClickListener(){
+            if (isPaused){
+                resumeGame()
+            }
+            else{
+                pauseGame()
+            }
+        }
+        buttonPlayAgain.setOnClickListener(){
+            // Restarts the game
+            stopGame()
+            startGame()
+        }
 
         // Prompt the user to start game by pressing any button
         Toast.makeText(this,"Press any button to start the game!",Toast.LENGTH_SHORT).show()
 
-
+        groupGameOver.visibility = View.INVISIBLE
 
     }
 
@@ -110,6 +145,7 @@ class GameSnake : AppCompatActivity() {
         Log.i("GameStatus","Game Started")
 
         // Initialize game clock and start it, effectively starting the game
+        gameClock = Timer()
         gameClock.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 // Forces the logic to run on same thread as UI, prevents application from crashing
@@ -123,6 +159,7 @@ class GameSnake : AppCompatActivity() {
         gameSnakeEngine.newGame()
 
         isStarted = true
+        resumeGame()
     }
 
     // Stops the game entirely, can only be started again with startGame function
@@ -139,10 +176,12 @@ class GameSnake : AppCompatActivity() {
 
     // Pauses the game to its current state, resume with continueGame function
     private fun pauseGame(){
-        if (isPaused){return}
+        if (isPaused || gameSnakeEngine.gameOver){return}
         Log.i("GameStatus","Game Paused")
 
-        // TODO: Pause game logic
+        gameSnakeEngine.isPaused = true
+        buttonTogglePause.text = "Resume"
+        groupGamePaused.visibility = View.VISIBLE
 
         isPaused = true
     }
@@ -152,14 +191,16 @@ class GameSnake : AppCompatActivity() {
         if (!isPaused){return}
         Log.i("GameStatus","Game Resumed")
 
-        // TODO: Continue game logic
+        gameSnakeEngine.isPaused = false
+        buttonTogglePause.text = "Pause"
+        groupGamePaused.visibility = View.INVISIBLE
 
         isPaused = false
     }
 
     // Gets called in regular intervals to advance game state
     private fun onGameTick() {
-        Log.i("Game", "Tick: ${gameSnakeEngine.currentTick}")
+
         handleGameLogic()
 
         // Update view on the user's device
@@ -168,22 +209,45 @@ class GameSnake : AppCompatActivity() {
 
     // Advances game state, call once per game tick
     private fun handleGameLogic() {
+        // If the game is not over
+        if (!gameSnakeEngine.gameOver){
 
-        // Handle input
-        when(nextInput){
-            GameInput.NONE -> {}
-            GameInput.LEFT -> gameSnakeEngine.snakeStageMoveLeft()
-            GameInput.RIGHT -> gameSnakeEngine.snakeStageMoveRight()
-            GameInput.UP -> gameSnakeEngine.snakeStageMoveUp()
-            GameInput.DOWN -> gameSnakeEngine.snakeStageMoveDown()
+            groupGameOver.visibility = View.INVISIBLE
 
+            // Handle input
+            when(nextInput){
+                GameInput.NONE -> {}
+                GameInput.LEFT -> gameSnakeEngine.snakeStageMoveLeft()
+                GameInput.RIGHT -> gameSnakeEngine.snakeStageMoveRight()
+                GameInput.UP -> gameSnakeEngine.snakeStageMoveUp()
+                GameInput.DOWN -> gameSnakeEngine.snakeStageMoveDown()
+
+            }
+
+            // Advance game state
+            gameSnakeEngine.nextTick()
+
+            // Update text view for the score
+            val scoreText = "Score: " + gameSnakeEngine.score.toString()
+            textScore.text = scoreText
+
+            // Reset next input
+            nextInput = GameInput.NONE
         }
 
-        // Advance game state
-        gameSnakeEngine.next()
+        // If the game is over (even during the same logic cycle)
+        if (gameSnakeEngine.gameOver){
+            val scoreText = "Your score was: " + gameSnakeEngine.score.toString()
+            val gameOverReasonText = "Game ended because " + gameSnakeEngine.gameOverReason
 
-        // Reset next input
-        nextInput = GameInput.NONE
+            textGameOverScore.text = scoreText
+            textGameOverReason.text = gameOverReasonText
+
+            groupGameOver.visibility = View.VISIBLE
+        }
+
+
+
     }
 
     // Draws a bitmap based on current game state, bitmap dimension are defined by game dimensions
@@ -193,8 +257,8 @@ class GameSnake : AppCompatActivity() {
             Bitmap.createBitmap(gameDimensionX, gameDimensionY, Bitmap.Config.ARGB_8888)
 
         // Iterates all values from game state and set corresponding pixels
-        for (x in 0 until gameSnakeEngine.getState().size - 1) {
-            for (y in 0 until gameSnakeEngine.getState()[0].size - 1) {
+        for (x in 0 until gameSnakeEngine.getState().size) {
+            for (y in 0 until gameSnakeEngine.getState()[0].size) {
 
                 // If plot is empty (0)
                 if (gameSnakeEngine.getState()[x][y] == 0) {
@@ -259,6 +323,19 @@ private class GameSnakeEngine(gameSizeX: Int, gameSizeY: Int, snakeStartLength: 
 
     // State Related -------------------------------------------------------------------------------
 
+    open var gameOver: Boolean = false
+    get
+    private set
+
+    open var gameOverReason: String = ""
+    get
+    private set
+
+    // If game state is set to pause, nextTick() method has no effect
+    open var isPaused: Boolean = false
+    get
+    set
+
     // Directions of how the game map can be navigated with
     enum class Direction{UP,DOWN,LEFT,RIGHT}
 
@@ -289,11 +366,18 @@ private class GameSnakeEngine(gameSizeX: Int, gameSizeY: Int, snakeStartLength: 
 
     // Applies staged changes to current game state cycle and
     // Should be called once per tick to advance the game!
-    open fun next(){
-        var gameOver: Boolean = false
+    open fun nextTick(){
+        // Do not execute any logic if game is paused or over
+        if (isPaused || gameOver){return}
+
+        Log.i("Game", "Tick: $currentTick")
 
         // Move snake according to proposed changes
-        gameOver = snake.move(stagedSnakeNextMoveDirection)
+        if (snake.move(stagedSnakeNextMoveDirection)){
+            gameOver = true
+            gameOverReason = "Snake hit its own tail"
+        }
+
 
         // Reset proposed change variables
         stagedSnakeNextMoveDirection = Snake.MoveDirection.FORWARD
@@ -303,12 +387,12 @@ private class GameSnakeEngine(gameSizeX: Int, gameSizeY: Int, snakeStartLength: 
             || snake.getSnakeHead().x < 0 || snake.getSnakeHead().y  < 0 )
         {
             gameOver = true
+            gameOverReason = "Snake hit a wall"
         }
 
         // If game over conditions have been met
         if (gameOver){
-            Log.i("Game", "Game Over! Your score was: $score")
-            newGame()
+            Log.i("Game", "Game Over! Reason: $gameOverReason Your score was: $score")
         }
 
         // Check if snake ate food
@@ -355,8 +439,8 @@ private class GameSnakeEngine(gameSizeX: Int, gameSizeY: Int, snakeStartLength: 
     private fun setStateToSingleValue(value: Int){
 
         // Iterates all values from game state and sets them
-        for (x in 0 until gameState.size - 1) {
-            for (y in 0 until gameState[0].size - 1) {
+        for (x in 0 until gameState.size) {
+            for (y in 0 until gameState[0].size) {
 
                 gameState[x][y] = value
             }
@@ -365,11 +449,13 @@ private class GameSnakeEngine(gameSizeX: Int, gameSizeY: Int, snakeStartLength: 
 
     // Sets current game state to a default beginning of a new game of snake
     open fun newGame(){
+        gameOver = false
+        currentTick = 0
         score = 0
 
         // Set all values to 0
-        for (x in 0 until gameState.size - 1) {
-            for (y in 0 until gameState[0].size - 1) {
+        for (x in 0 until gameState.size) {
+            for (y in 0 until gameState[0].size) {
 
                 gameState[x][y] = 0
             }
