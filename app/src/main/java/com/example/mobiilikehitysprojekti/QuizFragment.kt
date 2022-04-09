@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.findNavController
+import com.bumptech.glide.Glide
 import com.example.mobiilikehitysprojekti.databinding.FragmentQuizBinding
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -15,47 +16,79 @@ class QuizFragment : Fragment() {
 
     //Database
     private lateinit var db: FirebaseFirestore
+    private lateinit var binding: FragmentQuizBinding
+    private var questionList: MutableList<Question> = arrayListOf()
+    private var index: Int = 0
+    private var answer: Int = 0
+    private var points: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
         // Initializing firestore database
         db = FirebaseFirestore.getInstance()
-        val questionsList = ArrayList<Question>()
 
-        val binding = DataBindingUtil.inflate<FragmentQuizBinding>(inflater,
+        binding = DataBindingUtil.inflate<FragmentQuizBinding>(inflater,
             R.layout.fragment_quiz, container, false)
 
         // Get category name from categoryFragment
         setFragmentResultListener("category") { key, bundle ->
             val categoryName = bundle.getString("name")
 
-            // Get questions from database
+            // Get questions from database and shuffle them
             val collectionName = "${categoryName}Questions"
             db.collection(collectionName)
                 .get()
                 .addOnSuccessListener {
                     for (question in it) {
                         val questionObject = question.toObject(Question::class.java)
-                        questionsList.add(questionObject)
+                        questionList.add(questionObject)
                     }
-                    println(questionsList)
+                    questionList.shuffle()
+                    setQuestion()
                 }
                 .addOnFailureListener { exception ->
                     println("Error getting questions: $exception")
                 }
         }
-
         binding.optionOne.setOnClickListener(optionClick)
         binding.optionTwo.setOnClickListener(optionClick)
         binding.optionThree.setOnClickListener(optionClick)
         binding.optionFour.setOnClickListener(optionClick)
-
         return binding.root
     }
 
-    // Listener for clicking question options
+    private fun setQuestion() {
+        binding.question.text = questionList[index].question
+        if (questionList[index].imageURL != "") {
+            Glide.with(this)
+                .load(questionList[index].imageURL)
+                .into(binding.questionImage)
+        }
+        binding.optionOne.text = questionList[index].optionOne
+        binding.optionTwo.text = questionList[index].optionTwo
+        binding.optionThree.text = questionList[index].optionThree
+        binding.optionFour.text = questionList[index].optionFour
+    }
+
     private val optionClick: View.OnClickListener = View.OnClickListener { view ->
-        view.findNavController().navigate(R.id.action_quizFragment_to_resultFragment)
+        answer = when (view.id) {
+            R.id.optionOne -> 1
+            R.id.optionTwo -> 2
+            R.id.optionThree -> 3
+            else -> 4
+        }
+
+        if (index < 5) {
+            // Check the answer
+            if (answer == questionList[index].correctOption) {
+                points++
+            }
+            index++
+            setQuestion()
+        } else {
+            println(points)
+            view.findNavController().navigate(R.id.action_quizFragment_to_resultFragment)
+        }
     }
 }
