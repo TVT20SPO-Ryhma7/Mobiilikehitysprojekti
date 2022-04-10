@@ -5,7 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.findNavController
 import com.bumptech.glide.Glide
@@ -64,6 +66,8 @@ class QuizFragment : Fragment() {
             Glide.with(this)
                 .load(questionList[index].imageURL)
                 .into(binding.questionImage)
+        } else {
+            binding.questionImage.setImageResource(R.drawable.ic_baseline_question)
         }
         binding.optionOne.text = questionList[index].optionOne
         binding.optionTwo.text = questionList[index].optionTwo
@@ -79,15 +83,16 @@ class QuizFragment : Fragment() {
             else -> 4
         }
 
-        if (index < 5) {
-            // Check the answer
-            if (answer == questionList[index].correctOption) {
-                points++
-            }
+        // Check the answer
+        if (answer == questionList[index].correctOption) {
+            points++
+        }
+
+        if (index < 4) {
             index++
             setQuestion()
         } else {
-            println(points)
+            setFragmentResult("playerPoints", bundleOf("points" to points))
             view.findNavController().navigate(R.id.action_quizFragment_to_resultFragment)
         }
     }
