@@ -7,17 +7,20 @@ import android.os.Looper
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 
 class GameSpeed : AppCompatActivity() {
 
-    //Declaring Buttons and textview
+    //Declaring Buttons and textviews
     private lateinit var startGameButton: Button
     private lateinit var redButton: Button
     private lateinit var yellowButton: Button
     private lateinit var greenButton: Button
     private lateinit var orangeButton: Button
     private lateinit var pointsTextView: TextView
+    private lateinit var highScoreTextView: TextView
 
     //Timer to speed up the game
     private val timer = Timer()
@@ -47,6 +50,12 @@ class GameSpeed : AppCompatActivity() {
         }
     }
 
+    //Authentication
+    private lateinit var firebaseAuth: FirebaseAuth
+
+    //Database
+    private lateinit var firebaseFirestore: FirebaseFirestore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_speed)
@@ -58,6 +67,7 @@ class GameSpeed : AppCompatActivity() {
         greenButton = findViewById(R.id.btnGreen)
         orangeButton = findViewById(R.id.btnOrange)
         pointsTextView = findViewById(R.id.tvPointCounter)
+        highScoreTextView = findViewById(R.id.tvHighScoreSpeedGame)
 
         //Listener for clicking the "start the game"-button
         startGameButton.setOnClickListener {
@@ -93,12 +103,19 @@ class GameSpeed : AppCompatActivity() {
             playerString += "4"
             checkLose()
         }
+
+        //Initializing firebase authentication
+        firebaseAuth = FirebaseAuth.getInstance()
+
+        //Initializing firestore database
+        firebaseFirestore = FirebaseFirestore.getInstance()
     }
 
     private fun startGame() {
         //re-initializing the game variables
         points = 0
         pointsTextView.text = points.toString()
+        highScoreTextView.visibility = View.INVISIBLE
         gameString = ""
         playerString = ""
         gameLogicInterval = 700
@@ -120,8 +137,13 @@ class GameSpeed : AppCompatActivity() {
     private fun loseGame() {
         //Stops the game logic loop
         handler.removeCallbacks(updater)
+        timer.purge()
         //Makes the "start the game"-button visible
         startGameButton.visibility = View.VISIBLE
+        //Turns the light off from every button
+        clearButtons()
+        //Checks if player got a new highscore
+        checkHighScore()
     }
 
     //This executes every game loop
@@ -190,10 +212,28 @@ class GameSpeed : AppCompatActivity() {
         orangeButton.setBackgroundColor(getColor(R.color.orange_100))
     }
 
+    private fun checkHighScore() {
+        //Gets players current highscore from database
+        firebaseFirestore.collection("Scores")
+            .document(firebaseAuth.currentUser!!.uid).get().addOnSuccessListener { document ->
+                //Checks if the score is bigger than current highscore
+                if (points > document["SpeedGamePts"].toString().toInt()) {
+                    //Updates the highscore into database
+                    firebaseFirestore.collection("Scores")
+                        .document(firebaseAuth.currentUser!!.uid)
+                        .update(hashMapOf<String, Any>(
+                            "SpeedGamePts" to points
+                        ))
+
+                    //Congratulates player for new highscore
+                    highScoreTextView.visibility = View.VISIBLE
+            }
+        }
+    }
+
     //This executes when the user goes back to main menu
     override fun onStop() {
         super.onStop()
-
         //Stopping and clearing the timer
         timer.cancel()
         timer.purge()

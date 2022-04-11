@@ -177,4 +177,12 @@ class MainActivityLoggedIn : AppCompatActivity() {
             super.onBackPressed()
         }
     }
+
+    //Refreshes main activity when returning from another activity
+    override fun onRestart() {
+        super.onRestart()
+        var intent = intent
+        finish()
+        startActivity(intent)
+    }
 }

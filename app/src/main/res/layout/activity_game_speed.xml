@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
+    android:background="@color/lavender"
     tools:context=".GameSpeed">
 
     <TextView
@@ -19,8 +20,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/tvHighScoreSpeedGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/new_highscore"
+        android:textSize="30sp"
+        android:textColor="@color/black"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvPointCounter" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnStartSpeedGame"
+        android:backgroundTint="@color/teal_700"
         android:layout_width="wrap_content"
         android:layout_height="70dp"
         android:layout_marginBottom="20dp"
