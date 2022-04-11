@@ -6,7 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.setFragmentResult
 import androidx.navigation.findNavController
 import com.example.mobiilikehitysprojekti.databinding.FragmentCategoryBinding
 
@@ -28,6 +30,15 @@ class CategoryFragment : Fragment() {
 
     // Listener for clicking categories
     private val categoryClick: View.OnClickListener = View.OnClickListener { view ->
+        val categoryName = when (view.id) {
+            R.id.categoryGames -> "Game"
+            R.id.categorySports -> "Sport"
+            R.id.categoryMusic -> "Music"
+            R.id.categoryCars -> "Car"
+            R.id.categoryCountries -> "Country"
+            else -> ""
+        }
+        setFragmentResult("category", bundleOf("name" to categoryName))
         view.findNavController().navigate(R.id.action_categoryFragment_to_quizFragment)
     }
 }
