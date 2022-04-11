@@ -128,10 +128,14 @@ class GameSpeed : AppCompatActivity() {
             override fun run() {
                 //This prevents the interval from going to zero
                 if (gameLogicInterval > 10) {
-                    gameLogicInterval -= 8
+                    gameLogicInterval -= if (gameLogicInterval < 400) {
+                        6
+                    } else {
+                        8
+                    }
                 }
             }
-        }, 0, 1000)
+        }, 0, 1100)
     }
 
     private fun loseGame() {
@@ -209,7 +213,7 @@ class GameSpeed : AppCompatActivity() {
         redButton.setBackgroundColor(getColor(R.color.red_200))
         yellowButton.setBackgroundColor(getColor(R.color.yellow_100))
         greenButton.setBackgroundColor(getColor(R.color.green_200))
-        orangeButton.setBackgroundColor(getColor(R.color.orange_100))
+        orangeButton.setBackgroundColor(getColor(R.color.orange_200))
     }
 
     private fun checkHighScore() {
