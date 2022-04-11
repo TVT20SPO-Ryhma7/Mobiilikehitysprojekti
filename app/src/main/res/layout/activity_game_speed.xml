@@ -58,6 +58,7 @@
             android:id="@+id/btnRed"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             app:strokeWidth="8dp"
+            app:rippleColor="@null"
             android:layout_width="150dp"
             android:layout_height="160dp"
             android:layout_marginEnd="10dp"
@@ -68,6 +69,7 @@
             android:id="@+id/btnYellow"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             app:strokeWidth="8dp"
+            app:rippleColor="@null"
             android:layout_width="150dp"
             android:layout_height="160dp"
             android:layout_marginStart="10dp"
@@ -90,6 +92,7 @@
             android:id="@+id/btnGreen"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             app:strokeWidth="8dp"
+            app:rippleColor="@null"
             android:layout_width="150dp"
             android:layout_height="160dp"
             android:layout_marginEnd="10dp"
@@ -100,11 +103,12 @@
             android:id="@+id/btnOrange"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             app:strokeWidth="8dp"
+            app:rippleColor="@null"
             android:layout_width="150dp"
             android:layout_height="160dp"
             android:layout_marginStart="10dp"
             app:cornerRadius="75dp"
-            android:backgroundTint="@color/orange_100" />
+            android:backgroundTint="@color/orange_200" />
 
     </LinearLayout>
 
