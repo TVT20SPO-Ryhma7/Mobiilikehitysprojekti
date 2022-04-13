@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 import org.w3c.dom.Text
 import java.security.acl.Group
 import java.util.*
@@ -21,6 +22,8 @@ class GameSnake : AppCompatActivity() {
     // Variables -----------------------------------------------------------------------------------
 
     // Activity variables--------------------
+    private lateinit var firebaseAuth :FirebaseAuth
+
     private lateinit var gameView: ImageView
     private lateinit var buttonUp: Button
     private lateinit var buttonDown: Button
@@ -67,6 +70,9 @@ class GameSnake : AppCompatActivity() {
         // Default activity stuff, I guess. No touchy!
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_snake)
+
+        // Initialize firebase
+        firebaseAuth = FirebaseAuth.getInstance()
 
         // Get component references
         gameView = findViewById(R.id.gameView)
