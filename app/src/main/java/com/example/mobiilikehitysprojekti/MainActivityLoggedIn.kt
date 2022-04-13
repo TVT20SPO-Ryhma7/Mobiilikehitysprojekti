@@ -89,6 +89,7 @@ class MainActivityLoggedIn : AppCompatActivity() {
         val textViewMatopeliPts: TextView = findViewById(R.id.tvMatopeliPoints)
         val textViewTetrisPts: TextView = findViewById(R.id.tvTetrisPoints)
         val textViewTriviaPts: TextView = findViewById(R.id.tvTriviaPoints)
+        val textViewSpeedGamePoints: TextView = findViewById(R.id.tvNopeuspeliPoints)
 
         //Getting currently logged in users points for each game and displaying them in game cardviews
         firebaseFirestore.collection("Scores")
@@ -99,6 +100,8 @@ class MainActivityLoggedIn : AppCompatActivity() {
                 textViewTetrisPts.text = ptsString
                 ptsString = document["TriviaPts"].toString() +" "+ getString(R.string.pts)
                 textViewTriviaPts.text = ptsString
+                ptsString = document["SpeedGamePts"].toString() +" "+ getString(R.string.pts)
+                textViewSpeedGamePoints.text = ptsString
             }
             .addOnFailureListener { e ->
                 Log.d(TAG, "Database GET failed: ", e)
@@ -153,8 +156,9 @@ class MainActivityLoggedIn : AppCompatActivity() {
                 startActivity(triviaIntent)
             }
             R.id.mcvNopeuspeli -> {
-                //Placeholder
-                Toast.makeText(this, "Nopeuspeli", Toast.LENGTH_SHORT).show()
+                // Creates new intent and loads 'GameSpeed' activity
+                val speedGameIntent = Intent(this, GameSpeed::class.java)
+                startActivity(speedGameIntent)
             }
         }
     }
@@ -172,5 +176,13 @@ class MainActivityLoggedIn : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    //Refreshes main activity when returning from another activity
+    override fun onRestart() {
+        super.onRestart()
+        var intent = intent
+        finish()
+        startActivity(intent)
     }
 }
