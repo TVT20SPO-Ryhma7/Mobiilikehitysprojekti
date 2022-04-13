@@ -117,15 +117,21 @@ class MainActivity : AppCompatActivity() {
     //Starting activity for google sign in
     private var signInGoogle = registerForActivityResult (
         ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
+        Log.i("Auth","Starting Google sign in activity...")
+        if (result.resultCode == Activity.RESULT_OK) { //TODO: <- Can not get past this check!!! SHA Fingerpint required!
             //Getting signed in google account and passing it to handleResult() function
             val task:Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             handleResult(task)
+        }
+        else {
+            Log.i("Auth","Google sign in failed with result code of: ${result.resultCode}")
+            println("Check SHA Fingerprint!")
         }
     }
 
     //Handling google sign in result
     private fun handleResult(completedTask: Task<GoogleSignInAccount>) {
+        Log.i("Auth","Handling Google sign in results...")
         try {
             val account: GoogleSignInAccount? = completedTask.getResult(ApiException::class.java)
             //If task returns account object passing it to firebaseAuthWithGoogleAccount() function
@@ -140,6 +146,7 @@ class MainActivity : AppCompatActivity() {
 
     //Authenticating user to firebase with google user
     private fun firebaseAuthWithGoogleAccount(account: GoogleSignInAccount){
+        Log.i("Auth","Making authentication with Google account to Firebase...")
         //Getting a credential with google account id token
         val credential= GoogleAuthProvider.getCredential(account.idToken,null)
         //Using the credential to sign the account in to firebase
@@ -147,6 +154,7 @@ class MainActivity : AppCompatActivity() {
             if(task.isSuccessful) {
                 //Checking if user is new or already registered
                 if (task.result.additionalUserInfo!!.isNewUser) {
+                    Log.i("Auth","New user sign-in detected, creating a new Firestore profile for the user...")
                     //Creating a document with user id in firestore and initializing points to 0
                     firebaseFirestore
                         .collection("Scores")
@@ -158,6 +166,7 @@ class MainActivity : AppCompatActivity() {
                         ))
                 }
                 //Starting logged in -activity
+                Log.i("Auth","Starting activity in signed in state...")
                 val intent = Intent(this, MainActivityLoggedIn::class.java)
                 startActivity(intent)
                 finish()
@@ -182,6 +191,7 @@ class MainActivity : AppCompatActivity() {
             R.id.mcvMatopeli -> {
                 // Creates new intent and loads 'GameSnake' activity
                 val snakeIntent: Intent = Intent(this,GameSnake::class.java)
+                snakeIntent.putExtra("CurrentUser", firebaseAuth.currentUser?.uid)
                 this.startActivity(snakeIntent)
             }
             R.id.mcvTetris -> {
