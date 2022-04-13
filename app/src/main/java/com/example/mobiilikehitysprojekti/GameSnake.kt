@@ -11,8 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import org.w3c.dom.Text
-import java.security.acl.Group
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 import kotlin.random.Random
 
@@ -23,6 +22,7 @@ class GameSnake : AppCompatActivity() {
 
     // Activity variables--------------------
     private lateinit var firebaseAuth :FirebaseAuth
+    private lateinit var firebaseFirestore: FirebaseFirestore
 
     private lateinit var gameView: ImageView
     private lateinit var buttonUp: Button
@@ -36,6 +36,7 @@ class GameSnake : AppCompatActivity() {
     private lateinit var textGameOverTitle: TextView
     private lateinit var textGameOverScore: TextView
     private lateinit var textGameOverReason: TextView
+    private lateinit var textGameOverHighScore: TextView
     private lateinit var buttonPlayAgain: Button
     private lateinit var groupGameOver: androidx.constraintlayout.widget.Group
 
@@ -73,6 +74,7 @@ class GameSnake : AppCompatActivity() {
 
         // Initialize firebase
         firebaseAuth = FirebaseAuth.getInstance()
+        firebaseFirestore = FirebaseFirestore.getInstance()
 
         // Get component references
         gameView = findViewById(R.id.gameView)
@@ -86,6 +88,7 @@ class GameSnake : AppCompatActivity() {
         textGameOverTitle = findViewById(R.id.textViewTitleGameOver)
         textGameOverScore = findViewById(R.id.textViewGameOverScore)
         textGameOverReason = findViewById(R.id.textViewGameOverReason)
+        textGameOverHighScore = findViewById(R.id.textViewHighScore)
         buttonPlayAgain = findViewById(R.id.buttonGameOverPlayAgain)
         groupGameOver = findViewById(R.id.groupEndScreen)
         groupGamePaused = findViewById(R.id.groupPause)
@@ -131,6 +134,7 @@ class GameSnake : AppCompatActivity() {
 
         // Prompt the user to start game by pressing any button
         Toast.makeText(this,"Press any button to start the game!",Toast.LENGTH_SHORT).show()
+        Toast.makeText(this,"Firebase: " + firebaseAuth.currentUser?.email.toString(),Toast.LENGTH_SHORT).show()
 
         groupGameOver.visibility = View.INVISIBLE
 
@@ -143,6 +147,8 @@ class GameSnake : AppCompatActivity() {
 
         // Stop the game
         stopGame()
+
+        firebaseAuth = FirebaseAuth.getInstance()
     }
 
     // Starts the game from the beginning
@@ -164,6 +170,9 @@ class GameSnake : AppCompatActivity() {
 
         gameSnakeEngine.newGame()
 
+        textGameOverHighScore.text = ""
+
+        onGameOverCalled = false
         isStarted = true
         resumeGame()
     }
@@ -243,6 +252,22 @@ class GameSnake : AppCompatActivity() {
 
         // If the game is over (even during the same logic cycle)
         if (gameSnakeEngine.gameOver){
+            onGameOver()
+
+
+
+
+        }
+
+
+
+    }
+
+    // This function gets called once after the game end
+    private var onGameOverCalled = false
+    private fun onGameOver(){
+        if (!onGameOverCalled){
+
             val scoreText = "Your score was: " + gameSnakeEngine.score.toString()
             val gameOverReasonText = "Game ended because " + gameSnakeEngine.gameOverReason
 
@@ -250,10 +275,14 @@ class GameSnake : AppCompatActivity() {
             textGameOverReason.text = gameOverReasonText
 
             groupGameOver.visibility = View.VISIBLE
+
+            updateHighScoreToDatabase(gameSnakeEngine.score)
+
+
+
+            // Update function state
+            onGameOverCalled = true
         }
-
-
-
     }
 
     // Draws a bitmap based on current game state, bitmap dimension are defined by game dimensions
@@ -293,6 +322,42 @@ class GameSnake : AppCompatActivity() {
     }
 
 
+    // Updates given score to database(Firestore) if it exceeds users current record
+    // Returns true if new high-score was recorded
+    private fun updateHighScoreToDatabase(newScore:Int){
+        // Return if user has not signed in
+        if (firebaseAuth.currentUser == null)
+        {
+            Log.i("Game", "Cannot update high-score because user has not signed in.")
+            return
+        }
+
+        firebaseFirestore.collection("Scores")
+            .document(firebaseAuth.currentUser!!.uid).get().addOnSuccessListener {
+                document ->
+
+                // Compare new score to already existing high-score
+                // If new score exceeds previous amount, update it to the database
+                if (newScore > document["MatopeliPts"].toString().toInt()){
+                    firebaseFirestore.collection("Scores")
+                        .document(firebaseAuth.currentUser!!.uid)
+                        .update(hashMapOf<String, Any>(
+                            "MatopeliPts" to newScore
+                        ))
+                    Log.i("Game", firebaseAuth.currentUser?.email.toString() + " has achieved new high-score of: " + newScore)
+
+                    // Update text views
+                    textGameOverHighScore.text = "NEW HIGH-SCORE!"
+
+                }
+                // If new score did not exceed the high-score
+                else {
+                    // Update text views
+                    textGameOverHighScore.text = ""
+                }
+            }
+        return
+    }
 
 }
 

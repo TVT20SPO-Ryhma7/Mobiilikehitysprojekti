@@ -110,7 +110,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="invisible"
-        app:constraint_referenced_ids="textViewTitleGameOver,imageViewEndScreenBackground,textViewGameOverReason,textViewGameOverScore,buttonGameOverPlayAgain" />
+        app:constraint_referenced_ids="textViewTitleGameOver,imageViewEndScreenBackground,textViewGameOverReason,textViewGameOverScore,buttonGameOverPlayAgain,textViewHighScore" />
 
     <ImageView
         android:id="@+id/imageViewEndScreenBackground"
@@ -156,15 +156,27 @@
 
     <TextView
         android:id="@+id/textViewGameOverReason"
-        android:layout_width="291dp"
-        android:layout_height="121dp"
+        android:layout_width="288dp"
+        android:layout_height="58dp"
         android:text="Game ended because ..."
         app:layout_constraintBottom_toBottomOf="@+id/imageViewEndScreenBackground"
         app:layout_constraintEnd_toEndOf="@+id/imageViewEndScreenBackground"
-        app:layout_constraintHorizontal_bias="0.521"
         app:layout_constraintStart_toStartOf="@+id/imageViewEndScreenBackground"
         app:layout_constraintTop_toTopOf="@+id/imageViewEndScreenBackground"
-        app:layout_constraintVertical_bias="0.65" />
+        app:layout_constraintVertical_bias="0.522" />
+
+    <TextView
+        android:id="@+id/textViewHighScore"
+        android:layout_width="283dp"
+        android:layout_height="51dp"
+        android:layout_marginStart="16dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/imageViewEndScreenBackground"
+        app:layout_constraintStart_toStartOf="@+id/imageViewEndScreenBackground"
+        app:layout_constraintTop_toTopOf="@+id/imageViewEndScreenBackground"
+        app:layout_constraintVertical_bias="0.662" />
 
     <Button
         android:id="@+id/buttonGameOverPlayAgain"
