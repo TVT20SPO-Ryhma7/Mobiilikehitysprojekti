@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
     private var signInGoogle = registerForActivityResult (
         ActivityResultContracts.StartActivityForResult()) { result ->
         Log.i("Auth","Starting Google sign in activity...")
-        if (result.resultCode == Activity.RESULT_OK) { //TODO: <- Can not get past this check!!! SHA Fingerpint required!
+        if (result.resultCode == Activity.RESULT_OK) { // Execution fails here if you have no linked SHA fingerprint to Firebase!
             //Getting signed in google account and passing it to handleResult() function
             val task:Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             handleResult(task)

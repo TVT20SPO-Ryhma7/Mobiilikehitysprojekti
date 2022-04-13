@@ -63,6 +63,7 @@ class MainActivityLoggedIn : AppCompatActivity() {
         signOutButton.setOnClickListener {
             googleSignInClient.signOut().addOnCompleteListener {
                 //Starting sign out intent
+                firebaseAuth.signOut()
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
