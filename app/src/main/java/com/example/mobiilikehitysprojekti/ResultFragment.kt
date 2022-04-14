@@ -8,23 +8,52 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.findNavController
+import com.example.mobiilikehitysprojekti.databinding.FragmentQuizBinding
 import com.example.mobiilikehitysprojekti.databinding.FragmentResultBinding
-
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ResultFragment : Fragment() {
+
+    // Database and auth
+    private lateinit var db: FirebaseFirestore
+    private lateinit var firebaseAuth: FirebaseAuth
+
+    private lateinit var binding: FragmentResultBinding
+
+    private var points: Int = 0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        val binding = DataBindingUtil.inflate<FragmentResultBinding>(inflater,
+        // Initialize firestore database and auth
+        db = FirebaseFirestore.getInstance()
+        firebaseAuth = FirebaseAuth.getInstance()
+
+        binding = DataBindingUtil.inflate<FragmentResultBinding>(inflater,
             R.layout.fragment_result, container, false)
 
         // Get points name from QuizFragment
         setFragmentResultListener("playerPoints") { key, bundle ->
-            val points = bundle.getInt("points")
-            val resultString = when (points) {
-                0,1 -> "You can do better!"
-                2,3 -> "Good job!"
-                else -> "Excellent job!"
+            points = bundle.getInt("points")
+
+            //Checks if player got a new high score
+            checkHighScore()
+
+            var resultString = ""
+            when (points) {
+                0,1 -> {
+                    resultString = "You can do better!"
+                    binding.resultImage.setImageResource(R.drawable.ic_baseline_mood_bad_24)
+                }
+                2,3 ->  {
+                    resultString = "Good job!"
+                    binding.resultImage.setImageResource(R.drawable.ic_baseline_mood_24)
+                }
+                else -> {
+                    resultString = "Excellent job!"
+                    binding.resultImage.setImageResource(R.drawable.ic_baseline_mood_24)
+                }
             }
             binding.resultText.text = resultString
             binding.resultPoints.text = "You got $points points out of 5!"
@@ -34,6 +63,23 @@ class ResultFragment : Fragment() {
             view.findNavController().navigate(R.id.action_resultFragment_to_categoryFragment)
         }
         return binding.root
+    }
+
+    private fun checkHighScore() {
+        //Gets players current high score from database
+        db.collection("Scores")
+            .document(firebaseAuth.currentUser!!.uid).get().addOnSuccessListener { document ->
+                //Checks if the score is bigger than current high score
+                if (points > document["TriviaPts"].toString().toInt()) {
+                    binding.highScoreText.visibility = View.VISIBLE
+                    //Updates the high score into database
+                    db.collection("Scores")
+                        .document(firebaseAuth.currentUser!!.uid)
+                        .update(hashMapOf<String, Any>(
+                            "TriviaPts" to points
+                        ))
+                }
+            }
     }
 
 }
