@@ -23,4 +23,10 @@
     <string name="start_the_game">Start the game</string>
     <string name="_0">0</string>
     <string name="new_highscore">New Highscore!</string>
+    <string name="title_activity_game_preferences">GamePreferencesActivity</string>
+    <string name="settings_header">App Settings</string>
+    <string name="game_preferences_header">Game Settings</string>
+    <string name="language_title">Language</string>
+    <string name="theme_title">Theme</string>
+    <string name="controls_title">Controls</string>
 </resources>
