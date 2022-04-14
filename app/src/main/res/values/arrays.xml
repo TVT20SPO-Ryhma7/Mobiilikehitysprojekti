@@ -1,31 +1,31 @@
 <resources>
     <string-array name="language_entries">
-        <item>English</item>
-        <item>Finnish</item>
+        <item>@string/english</item>
+        <item>@string/finnish</item>
     </string-array>
 
     <string-array name="language_values">
-        <item>English</item>
-        <item>Finnish</item>
+        <item>@string/english</item>
+        <item>@string/finnish</item>
     </string-array>
 
     <string-array name="theme_entries">
-        <item>Light</item>
-        <item>Dark</item>
+        <item>@string/light</item>
+        <item>@string/dark</item>
     </string-array>
 
     <string-array name="theme_values">
-        <item>Light</item>
-        <item>Dark</item>
+        <item>@string/light</item>
+        <item>@string/dark</item>
     </string-array>
 
     <string-array name="controls_entries">
-        <item>Buttons</item>
-        <item>Swipe</item>
+        <item>@string/buttons</item>
+        <item>@string/swipe</item>
     </string-array>
 
     <string-array name="controls_values">
-        <item>Buttons</item>
-        <item>Swipe</item>
+        <item>@string/buttons</item>
+        <item>@string/swipe</item>
     </string-array>
 </resources>
