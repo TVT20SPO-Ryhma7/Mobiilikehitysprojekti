@@ -22,9 +22,6 @@ class GameSpeed : AppCompatActivity() {
     private lateinit var pointsTextView: TextView
     private lateinit var highScoreTextView: TextView
 
-    //Timer to speed up the game
-    private val timer = Timer()
-
     //Time (ms) between game ticks
     private var gameLogicInterval: Long = 700
 
@@ -122,26 +119,11 @@ class GameSpeed : AppCompatActivity() {
 
         //Starts the game logic loop
         handler.post(updater)
-
-        //Decreases the game logic interval every second
-        timer.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                //This prevents the interval from going to zero
-                if (gameLogicInterval > 10) {
-                    gameLogicInterval -= if (gameLogicInterval < 400) {
-                        6
-                    } else {
-                        8
-                    }
-                }
-            }
-        }, 0, 1100)
     }
 
     private fun loseGame() {
         //Stops the game logic loop
         handler.removeCallbacks(updater)
-        timer.purge()
         //Makes the "start the game"-button visible
         startGameButton.visibility = View.VISIBLE
         //Turns the light off from every button
@@ -156,6 +138,27 @@ class GameSpeed : AppCompatActivity() {
         currentButton = getRandomInt()
         //Turns the light off from every button
         clearButtons()
+
+        //This prevents the interval from going to zero
+        if (gameLogicInterval > 10) {
+            gameLogicInterval -= when (gameLogicInterval) {
+                in 600..700 -> {
+                    5
+                }
+                in 500..599 -> {
+                    4
+                }
+                in 400..499 -> {
+                    3
+                }
+                in 300..399 -> {
+                    2
+                }
+                else -> {
+                    1
+                }
+            }
+        }
 
         //Checking which button is current button
         when (currentButton) {
@@ -238,9 +241,6 @@ class GameSpeed : AppCompatActivity() {
     //This executes when the user goes back to main menu
     override fun onStop() {
         super.onStop()
-        //Stopping and clearing the timer
-        timer.cancel()
-        timer.purge()
         //Clearing the handler data from memory
         handler.removeCallbacksAndMessages(null)
     }
