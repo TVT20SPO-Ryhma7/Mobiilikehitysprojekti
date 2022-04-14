@@ -35,6 +35,10 @@
     <string name="music">Music</string>
     <string name="cars">Cars</string>
     <string name="countries">Countries</string>
+    <string name="game">Game</string>
+    <string name="sport">Sport</string>
+    <string name="car">Car</string>
+    <string name="country">Country</string>
     <string name="question_will_be_displayed_here">Question will be displayed here</string>
     <string name="option_one">Option 1</string>
     <string name="option_two">Option 2</string>

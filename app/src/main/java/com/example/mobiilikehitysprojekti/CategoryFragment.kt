@@ -31,12 +31,11 @@ class CategoryFragment : Fragment() {
     // Listener for clicking categories
     private val categoryClick: View.OnClickListener = View.OnClickListener { view ->
         val categoryName = when (view.id) {
-            R.id.categoryGames -> "Game"
-            R.id.categorySports -> "Sport"
-            R.id.categoryMusic -> "Music"
-            R.id.categoryCars -> "Car"
-            R.id.categoryCountries -> "Country"
-            else -> ""
+            R.id.categoryGames -> getString(R.string.game)
+            R.id.categorySports -> getString(R.string.sport)
+            R.id.categoryMusic -> getString(R.string.music)
+            R.id.categoryCars -> getString(R.string.car)
+            else -> getString(R.string.country)
         }
         setFragmentResult("category", bundleOf("name" to categoryName))
         view.findNavController().navigate(R.id.action_categoryFragment_to_quizFragment)

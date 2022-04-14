@@ -35,6 +35,10 @@
     <string name="music">Musiikki</string>
     <string name="cars">Autot</string>
     <string name="countries">Maat</string>
+    <string name="game">Peli</string>
+    <string name="sport">Urheilu</string>
+    <string name="car">Auto</string>
+    <string name="country">Maa</string>
     <string name="question_will_be_displayed_here">Kysymys näytetään tässä</string>
     <string name="option_one">Vaihtoehto 1</string>
     <string name="option_two">Vaihtoehto 2</string>
