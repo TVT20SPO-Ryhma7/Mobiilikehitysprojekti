@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.findNavController
-import com.example.mobiilikehitysprojekti.databinding.FragmentQuizBinding
 import com.example.mobiilikehitysprojekti.databinding.FragmentResultBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -43,20 +42,23 @@ class ResultFragment : Fragment() {
             var resultString = ""
             when (points) {
                 0,1 -> {
-                    resultString = "You can do better!"
+                    resultString = getString(R.string.you_can_do_better)
                     binding.resultImage.setImageResource(R.drawable.ic_baseline_mood_bad_24)
                 }
                 2,3 ->  {
-                    resultString = "Good job!"
+                    resultString = getString(R.string.good_job)
                     binding.resultImage.setImageResource(R.drawable.ic_baseline_mood_24)
                 }
                 else -> {
-                    resultString = "Excellent job!"
+                    resultString = getString(R.string.excellent_job)
                     binding.resultImage.setImageResource(R.drawable.ic_baseline_mood_24)
                 }
             }
+            val txtYouGot = getString(R.string.you_got)
+            val txtPoints = getString(R.string.points)
+
             binding.resultText.text = resultString
-            binding.resultPoints.text = "You got $points points out of 5!"
+            binding.resultPoints.text = "$txtYouGot $points / 5 $txtPoints !"
         }
 
         binding.backToCategoriesButton.setOnClickListener { view : View ->

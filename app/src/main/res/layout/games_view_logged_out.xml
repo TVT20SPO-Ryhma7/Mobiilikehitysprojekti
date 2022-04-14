@@ -39,7 +39,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/purple_200"
                     android:gravity="center"
-                    android:text="@string/matopeli"
+                    android:text="@string/snake_name"
                     android:textColor="@color/black"
                     android:textSize="30sp" />
 
@@ -101,7 +101,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/purple_200"
                     android:gravity="center"
-                    android:text="@string/tetris"
+                    android:text="@string/tetris_name"
                     android:textColor="@color/black"
                     android:textSize="30sp" />
 
@@ -162,7 +162,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/purple_200"
                     android:gravity="center"
-                    android:text="@string/trivia"
+                    android:text="@string/trivia_name"
                     android:textColor="@color/black"
                     android:textSize="30sp" />
 
@@ -223,7 +223,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/purple_200"
                     android:gravity="center"
-                    android:text="@string/nopeuspeli"
+                    android:text="@string/speedtest_name"
                     android:textColor="@color/black"
                     android:textSize="30sp" />
 

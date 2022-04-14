@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:gravity="center"
-                android:text="Good job!"
+                android:text="@string/good_job"
                 android:textSize="30sp" />
 
             <ImageView
@@ -53,14 +53,14 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:gravity="center"
-                android:text="You got __ out of 5!"
+                android:text="@string/you_got"
                 android:textSize="22sp" />
 
             <Button
                 android:id="@+id/backToCategoriesButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Back to categories"
+                android:text="@string/back_to_categories"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"

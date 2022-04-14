@@ -95,13 +95,13 @@ class MainActivityLoggedIn : AppCompatActivity() {
         //Getting currently logged in users points for each game and displaying them in game cardviews
         firebaseFirestore.collection("Scores")
             .document(firebaseAuth.currentUser!!.uid).get().addOnSuccessListener { document ->
-                var ptsString = document["MatopeliPts"].toString() +" "+ getString(R.string.pts)
+                var ptsString = document["MatopeliPts"].toString() +" "+ getString(R.string.points)
                 textViewMatopeliPts.text = ptsString
-                ptsString = document["TetrisPts"].toString() +" "+ getString(R.string.pts)
+                ptsString = document["TetrisPts"].toString() +" "+ getString(R.string.points)
                 textViewTetrisPts.text = ptsString
-                ptsString = document["TriviaPts"].toString() +" "+ getString(R.string.pts)
+                ptsString = document["TriviaPts"].toString() +" "+ getString(R.string.points)
                 textViewTriviaPts.text = ptsString
-                ptsString = document["SpeedGamePts"].toString() +" "+ getString(R.string.pts)
+                ptsString = document["SpeedGamePts"].toString() +" "+ getString(R.string.points)
                 textViewSpeedGamePoints.text = ptsString
             }
             .addOnFailureListener { e ->
