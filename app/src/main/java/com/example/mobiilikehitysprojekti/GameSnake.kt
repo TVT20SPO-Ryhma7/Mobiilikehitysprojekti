@@ -23,6 +23,7 @@ class GameSnake : AppCompatActivity() {
     // Activity variables--------------------
     private lateinit var firebaseAuth :FirebaseAuth
     private lateinit var firebaseFirestore: FirebaseFirestore
+    private lateinit var highScoreManager: HighScoreManager
 
     private lateinit var gameView: ImageView
     private lateinit var buttonUp: Button
@@ -75,6 +76,7 @@ class GameSnake : AppCompatActivity() {
         // Initialize firebase
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseFirestore = FirebaseFirestore.getInstance()
+        highScoreManager = HighScoreManager(firebaseFirestore)
 
         // Get component references
         gameView = findViewById(R.id.gameView)
@@ -276,8 +278,19 @@ class GameSnake : AppCompatActivity() {
 
             groupGameOver.visibility = View.VISIBLE
 
-            updateHighScoreToDatabase(gameSnakeEngine.score)
-
+            // Request possible high-score update and handle callback function
+            highScoreManager.updateHighScore(gameSnakeEngine.score,HighScoreManager.Game.SNAKE,firebaseAuth.currentUser){
+                result ->
+                // If new high-score was recorded
+                if (result){
+                    // Update text views
+                    textGameOverHighScore.text = "NEW HIGH-SCORE!"
+                }
+                else{
+                    // Update text views
+                    textGameOverHighScore.text = ""
+                }
+            }
 
 
             // Update function state
@@ -319,44 +332,6 @@ class GameSnake : AppCompatActivity() {
 
         }
         return renderedView
-    }
-
-
-    // Updates given score to database(Firestore) if it exceeds users current record
-    // Returns true if new high-score was recorded
-    private fun updateHighScoreToDatabase(newScore:Int){
-        // Return if user has not signed in
-        if (firebaseAuth.currentUser == null)
-        {
-            Log.i("Game", "Cannot update high-score because user has not signed in.")
-            return
-        }
-
-        firebaseFirestore.collection("Scores")
-            .document(firebaseAuth.currentUser!!.uid).get().addOnSuccessListener {
-                document ->
-
-                // Compare new score to already existing high-score
-                // If new score exceeds previous amount, update it to the database
-                if (newScore > document["MatopeliPts"].toString().toInt()){
-                    firebaseFirestore.collection("Scores")
-                        .document(firebaseAuth.currentUser!!.uid)
-                        .update(hashMapOf<String, Any>(
-                            "MatopeliPts" to newScore
-                        ))
-                    Log.i("Game", firebaseAuth.currentUser?.email.toString() + " has achieved new high-score of: " + newScore)
-
-                    // Update text views
-                    textGameOverHighScore.text = "NEW HIGH-SCORE!"
-
-                }
-                // If new score did not exceed the high-score
-                else {
-                    // Update text views
-                    textGameOverHighScore.text = ""
-                }
-            }
-        return
     }
 
 }
