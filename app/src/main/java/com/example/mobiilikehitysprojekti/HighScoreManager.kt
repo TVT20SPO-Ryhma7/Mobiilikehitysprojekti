@@ -1,0 +1,163 @@
+package com.example.mobiilikehitysprojekti
+
+import android.util.Log
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.*
+import com.google.firestore.v1.Document
+import java.lang.reflect.Array
+import java.util.logging.Handler
+
+// Interface to deal with game related data stored in the Firebase
+// For example, game scores should be updated through this class in order to rank players accordingly
+class HighScoreManager(firestoreInstance: FirebaseFirestore) {
+
+    private var fs = firestoreInstance
+
+    init {
+
+    }
+
+    // Representation of available games in the system
+    enum class Game{
+        SNAKE,
+        TETRIS,
+        TRIVIA,
+        SPEED,
+    }
+
+    // Converts given game enum to a corresponding string ID in the database
+    private fun gameToDocumentId(game: Game): String{
+             return when(game){
+            Game.SNAKE -> "Snake"
+            Game.TETRIS -> "Tetris"
+            Game.TRIVIA -> "Trivia"
+            Game.SPEED -> "SpeedGame"
+        }
+    }
+
+    // Creates new high-score field to a given document for specified user
+    // Callback returns boolean value of whether new field was created
+    private fun createFieldForUser(user: FirebaseUser? ,document: DocumentSnapshot, callback: (result: Boolean) -> Unit){
+        if (user == null){
+            Log.w("High-ScoreManager","Given FirebaseUser was null!")
+            return
+        }
+
+        Log.i("High-ScoreManager", "Attempting to create new field in '" + document.id + "' for user '" + user!!.email + "'...")
+
+        // If user has no field in the database, create new field
+        if(document[user.uid] == null)
+        {
+
+            fs.collection("High-Scores")
+                .document(document.id)
+                .set(hashMapOf<String, Any>(
+                    user.uid to 0
+                ), SetOptions.merge()).addOnCompleteListener() {
+                    Log.i("High-ScoreManager", "New field created in '" + document.id + "' for user '" + user!!.email + "' successfully")
+
+                    // Invoke callback
+                    callback.invoke(true)
+                }
+        }
+        else{
+            Log.w("High-ScoreManager", "Failed to create new field in '" + document.id + "' for user '" + user!!.email + "', field for this user may already exist!")
+
+            // Invoke callback
+            callback.invoke(false)
+        }
+    }
+
+    // Updates high-score for the given game if it exceeds previous record
+    // Callback returns boolean value of whether new high-score was recorded or not
+    open fun updateHighScore(score: Int, game: Game, user: FirebaseUser?, callback: (result: Boolean) -> Unit){
+        if (user == null){
+            Log.w("High-ScoreManager","Given FirebaseUser was null, high-score cannot be updated!")
+            return
+        }
+
+        val documentId = gameToDocumentId(game)
+
+        fun compareAndUpdateHighScore(document: DocumentSnapshot){
+            // Compare new score to already existing high-score
+            // If new score exceeds previous amount, update it to the database
+            if (score > document[user.uid].toString().toInt()){
+                fs.collection("High-Scores")
+                    .document(documentId)
+                    .update(user.uid,score)
+                // Invoke callback
+                callback.invoke(true)
+            }
+            else{
+                // Invoke callback
+                callback.invoke(false)
+            }
+        }
+
+        // Get snapshot of the 'High-Scores' document from the database
+        fs.collection("High-Scores")
+            .document(documentId).get().addOnSuccessListener {
+                    document ->
+
+                // If user has no field in the database, create new field and update high-score
+                if(document[user.uid] == null)
+                {
+                    createFieldForUser(user, document){
+
+                        // Fetch the updated document with the newly added field
+                        fs.collection("High-Scores")
+                            .document(documentId).get().addOnSuccessListener {
+                                    document ->
+                                    compareAndUpdateHighScore(document)
+                            }
+                    }
+                }
+                // If a field already exists in user's name, update high-score
+                else{
+                    compareAndUpdateHighScore(document)
+                }
+            }
+    }
+
+
+    // Gets ranking order for the given game
+    private fun getRankingOrder(game: Game):HashMap<String, Int>{
+        var rankingOrder = hashMapOf<String, Int>()
+
+        // TODO
+
+        return rankingOrder
+    }
+
+
+    // Gets rank of a given user in a game
+    open fun getRanking(user: FirebaseUser? , game: Game): Int{
+
+        // Get document of the game
+        val documentId = gameToDocumentId(game)
+        fs.collection("High-Scores")
+            .document(documentId).get().addOnSuccessListener {
+                document ->
+                var documentData = document.data
+
+                // Form a ranking of the users
+                // TODO
+
+                // DEBUG
+                documentData?.forEach {
+                    println(it.key)
+                }
+
+                // Return the user's rank
+                // todo
+            }
+
+
+        return 0
+    }
+
+}
+
+data class LeaderboardItem(val userId: String, val userName: String, var score: Float, var rank: Int){
+    // TODO
+}
