@@ -97,14 +97,9 @@ class MainActivity : AppCompatActivity() {
         //Listener for clicking sidebar items
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_gamePref -> {
-                    //Placeholder
-                    Toast.makeText(this, "game preferences", Toast.LENGTH_SHORT).show()
-                    true
-                }
                 R.id.nav_settings -> {
-                    //Placeholder
-                    Toast.makeText(this, "settings", Toast.LENGTH_SHORT).show()
+                    val settingsIntent = Intent(this, SettingsActivity::class.java)
+                    startActivity(settingsIntent)
                     true
                 }
                 else -> {

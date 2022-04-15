@@ -95,13 +95,13 @@ class MainActivityLoggedIn : AppCompatActivity() {
         //Getting currently logged in users points for each game and displaying them in game cardviews
         firebaseFirestore.collection("Scores")
             .document(firebaseAuth.currentUser!!.uid).get().addOnSuccessListener { document ->
-                var ptsString = document["MatopeliPts"].toString() +" "+ getString(R.string.pts)
+                var ptsString = document["MatopeliPts"].toString() +" "+ getString(R.string.points)
                 textViewMatopeliPts.text = ptsString
-                ptsString = document["TetrisPts"].toString() +" "+ getString(R.string.pts)
+                ptsString = document["TetrisPts"].toString() +" "+ getString(R.string.points)
                 textViewTetrisPts.text = ptsString
-                ptsString = document["TriviaPts"].toString() +" "+ getString(R.string.pts)
+                ptsString = document["TriviaPts"].toString() +" "+ getString(R.string.points)
                 textViewTriviaPts.text = ptsString
-                ptsString = document["SpeedGamePts"].toString() +" "+ getString(R.string.pts)
+                ptsString = document["SpeedGamePts"].toString() +" "+ getString(R.string.points)
                 textViewSpeedGamePoints.text = ptsString
             }
             .addOnFailureListener { e ->
@@ -123,14 +123,9 @@ class MainActivityLoggedIn : AppCompatActivity() {
         //Listener for clicking sidebar items
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_gamePref -> {
-                    //Placeholder
-                    Toast.makeText(this, "game preferences", Toast.LENGTH_SHORT).show()
-                    true
-                }
                 R.id.nav_settings -> {
-                    //Placeholder
-                    Toast.makeText(this, "settings", Toast.LENGTH_SHORT).show()
+                    val settingsIntent = Intent(this, SettingsActivity::class.java)
+                    startActivity(settingsIntent)
                     true
                 }
                 else -> {

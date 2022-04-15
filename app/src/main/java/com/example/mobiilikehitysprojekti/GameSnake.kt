@@ -135,7 +135,8 @@ class GameSnake : AppCompatActivity() {
         }
 
         // Prompt the user to start game by pressing any button
-        Toast.makeText(this,"Press any button to start the game!",Toast.LENGTH_SHORT).show()
+        val txtPressAny = getString(R.string.press_any_button_to_start_game)
+        Toast.makeText(this,txtPressAny,Toast.LENGTH_SHORT).show()
         Toast.makeText(this,"Firebase: " + firebaseAuth.currentUser?.email.toString(),Toast.LENGTH_SHORT).show()
 
         groupGameOver.visibility = View.INVISIBLE
@@ -197,7 +198,7 @@ class GameSnake : AppCompatActivity() {
         Log.i("GameStatus","Game Paused")
 
         gameSnakeEngine.isPaused = true
-        buttonTogglePause.text = "Resume"
+        buttonTogglePause.text = getString(R.string.resume)
         groupGamePaused.visibility = View.VISIBLE
 
         isPaused = true
@@ -209,7 +210,7 @@ class GameSnake : AppCompatActivity() {
         Log.i("GameStatus","Game Resumed")
 
         gameSnakeEngine.isPaused = false
-        buttonTogglePause.text = "Pause"
+        buttonTogglePause.text = getString(R.string.pause)
         groupGamePaused.visibility = View.INVISIBLE
 
         isPaused = false
@@ -245,7 +246,7 @@ class GameSnake : AppCompatActivity() {
             gameSnakeEngine.nextTick()
 
             // Update text view for the score
-            val scoreText = "Score: " + gameSnakeEngine.score.toString()
+            val scoreText = getString(R.string.score_atm) + gameSnakeEngine.score.toString()
             textScore.text = scoreText
 
             // Reset next input
@@ -269,9 +270,8 @@ class GameSnake : AppCompatActivity() {
     private var onGameOverCalled = false
     private fun onGameOver(){
         if (!onGameOverCalled){
-
-            val scoreText = "Your score was: " + gameSnakeEngine.score.toString()
-            val gameOverReasonText = "Game ended because " + gameSnakeEngine.gameOverReason
+            val scoreText = getString(R.string.your_score_was) + " " + gameSnakeEngine.score.toString()
+            val gameOverReasonText = getString(R.string.game_ended_because)+ " " + gameSnakeEngine.gameOverReason
 
             textGameOverScore.text = scoreText
             textGameOverReason.text = gameOverReasonText
@@ -403,7 +403,6 @@ private class GameSnakeEngine(gameSizeX: Int, gameSizeY: Int, snakeStartLength: 
 
     // Next path the snake will attempt to take in current game cycle
     private var stagedSnakeNextMoveDirection: Snake.MoveDirection = Snake.MoveDirection.FORWARD
-
 
 
 
