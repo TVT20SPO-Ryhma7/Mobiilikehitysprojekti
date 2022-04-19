@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:padding="16dp"
     android:orientation="vertical"
-    android:background="?attr/colorAccent">
+    android:background="?attr/colorPrimary">
 
     <TextView
         android:layout_width="match_parent"
@@ -12,13 +12,15 @@
         android:layout_marginBottom="10dp"
         android:text="@string/not_logged_in"
         android:textSize="24sp"
-        android:textColor="@color/black"/>
+        android:textColor="?attr/colorOnPrimary"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="?attr/colorSecondary"
         android:text="@string/log_in"
+        android:textColor="?attr/colorOnSecondary"
         android:textSize="16sp"/>
 
 </LinearLayout>
