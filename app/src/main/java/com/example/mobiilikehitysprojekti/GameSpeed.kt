@@ -9,7 +9,6 @@ import android.widget.Button
 import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.*
 
 class GameSpeed : AppCompatActivity() {
 
@@ -35,6 +34,8 @@ class GameSpeed : AppCompatActivity() {
     private var playerString = ""
 
     private var points = 0
+
+    private lateinit var highScoreManager: HighScoreManager
 
     //This allows running the game code on repeat
     private val handler: Handler = Handler(Looper.getMainLooper())
@@ -106,6 +107,7 @@ class GameSpeed : AppCompatActivity() {
 
         //Initializing firestore database
         firebaseFirestore = FirebaseFirestore.getInstance()
+        highScoreManager = HighScoreManager(firebaseFirestore)
     }
 
     private fun startGame() {
@@ -220,20 +222,17 @@ class GameSpeed : AppCompatActivity() {
     }
 
     private fun checkHighScore() {
-        //Gets players current highscore from database
-        firebaseFirestore.collection("Scores")
-            .document(firebaseAuth.currentUser!!.uid).get().addOnSuccessListener { document ->
-                //Checks if the score is bigger than current highscore
-                if (points > document["SpeedGamePts"].toString().toInt()) {
-                    //Updates the highscore into database
-                    firebaseFirestore.collection("Scores")
-                        .document(firebaseAuth.currentUser!!.uid)
-                        .update(hashMapOf<String, Any>(
-                            "SpeedGamePts" to points
-                        ))
-
-                    //Congratulates player for new highscore
-                    highScoreTextView.visibility = View.VISIBLE
+        // Request possible high-score update and handle callback function
+        highScoreManager.updateHighScore(points,HighScoreManager.Game.SPEED,firebaseAuth.currentUser) {
+            result ->
+            // If new high-score was recorded
+            if (result){
+                //Making congratulation textview visible
+                highScoreTextView.visibility = View.VISIBLE
+            }
+            else {
+                //Making congratulation textview invisible
+                highScoreTextView.visibility = View.INVISIBLE
             }
         }
     }
