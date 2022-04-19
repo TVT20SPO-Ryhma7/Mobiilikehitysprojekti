@@ -24,4 +24,5 @@
     <color name="green_A700">#00c853</color>
     <color name="orange_200">#ffcc80</color>
     <color name="orange_A700">#ff6d00</color>
+    <color name="dark_grey">#303030</color>
 </resources>
