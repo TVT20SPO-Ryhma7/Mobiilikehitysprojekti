@@ -17,6 +17,7 @@ class ResultFragment : Fragment() {
     // Database and auth
     private lateinit var db: FirebaseFirestore
     private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var highScoreManager: HighScoreManager
 
     private lateinit var binding: FragmentResultBinding
 
@@ -28,6 +29,7 @@ class ResultFragment : Fragment() {
         // Initialize firestore database and auth
         db = FirebaseFirestore.getInstance()
         firebaseAuth = FirebaseAuth.getInstance()
+        highScoreManager = HighScoreManager(db)
 
         binding = DataBindingUtil.inflate<FragmentResultBinding>(inflater,
             R.layout.fragment_result, container, false)
@@ -68,20 +70,12 @@ class ResultFragment : Fragment() {
     }
 
     private fun checkHighScore() {
-        //Gets players current high score from database
-        db.collection("Scores")
-            .document(firebaseAuth.currentUser!!.uid).get().addOnSuccessListener { document ->
-                //Checks if the score is bigger than current high score
-                if (points > document["TriviaPts"].toString().toInt()) {
-                    binding.highScoreText.visibility = View.VISIBLE
-                    //Updates the high score into database
-                    db.collection("Scores")
-                        .document(firebaseAuth.currentUser!!.uid)
-                        .update(hashMapOf<String, Any>(
-                            "TriviaPts" to points
-                        ))
-                }
+        // Request possible high-score update and handle callback function
+        highScoreManager.updateHighScore(points, HighScoreManager.Game.TRIVIA, firebaseAuth.currentUser) { result ->
+            // If new high-score was recorded
+            if (result) {
+                binding.highScoreText.visibility = View.VISIBLE
             }
+        }
     }
-
 }
