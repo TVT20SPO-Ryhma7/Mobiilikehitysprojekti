@@ -1,8 +1,11 @@
 package com.example.mobiilikehitysprojekti
 
+import android.os.Debug
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
+import com.google.firebase.ktx.Firebase
 import com.google.firestore.v1.Document
 import java.lang.reflect.Array
 import java.util.logging.Handler
@@ -12,6 +15,12 @@ import java.util.logging.Handler
 class HighScoreManager(firestoreInstance: FirebaseFirestore) {
 
     private var fs = firestoreInstance
+
+    // Locally cached leaderboards for each game
+    private var cachedLeaderboardSnake: MutableList<LeaderboardItem> = mutableListOf()
+    private var cachedLeaderboardTetris: MutableList<LeaderboardItem> = mutableListOf()
+    private var cachedLeaderboardTrivia: MutableList<LeaderboardItem> = mutableListOf()
+    private var cachedLeaderboardSpeed: MutableList<LeaderboardItem> = mutableListOf()
 
     init {
 
@@ -85,6 +94,7 @@ class HighScoreManager(firestoreInstance: FirebaseFirestore) {
                 fs.collection("High-Scores")
                     .document(documentId)
                     .update(user.uid,score)
+                Log.i("High-ScoreManager",user.email + "'s new high-score of '" + score +"' was updated to database for game " + documentId)
                 // Invoke callback
                 callback.invoke(true)
             }
@@ -119,6 +129,62 @@ class HighScoreManager(firestoreInstance: FirebaseFirestore) {
             }
     }
 
+    // Updates the specified locally cached leaderboard with latest information from database
+    private fun updateCachedLeaderboard(game: Game, callback: (result: Boolean) -> Unit){
+            var allUsers: MutableMap<String, Any>?
+            var updatedLeaderboard = mutableListOf<LeaderboardItem>()
+
+            val documentId = gameToDocumentId(game)
+            fs.collection("High-Scores")
+                .document(documentId).get().addOnSuccessListener {
+                        document ->
+
+                    allUsers = document.data
+
+                    // If document contains no data of user high-scores
+                    if(allUsers == null){
+                        Log.i("High-ScoreManager",
+                            "Document '$documentId' has no stored user data"
+                        )
+                        callback.invoke(false)
+                    }
+
+                    allUsers?.forEach(){
+                        // TODO: Find usernames by UID (likely requires backend code execution due to security risk of accessing unauthorized user data in client)
+                        updatedLeaderboard.add(LeaderboardItem(it.key, it.key, it.value.toString().toFloat(), 0))
+                    }
+
+                    // Assign ranks for each user in cached leaderboard
+                    updatedLeaderboard.sortByDescending { it.score }
+                    var currentRank = 1
+                    updatedLeaderboard.forEach(){
+                        it.rank = currentRank
+                        currentRank++
+                    }
+
+                    // Apply new list
+                   when(game){
+                       Game.SNAKE -> {
+                           cachedLeaderboardSnake = updatedLeaderboard
+                       }
+                       Game.TETRIS -> {
+                            cachedLeaderboardTetris = updatedLeaderboard
+                       }
+                       Game.TRIVIA -> {
+                           cachedLeaderboardTrivia = updatedLeaderboard
+                       }
+                       Game.SPEED -> {
+                           cachedLeaderboardSpeed = updatedLeaderboard
+                       }
+                   }
+
+                    Log.i("High-ScoreManager","Updated locally cached leaderboard of '$game'")
+
+                    // Invoke callback after task is done
+                    callback.invoke(true)
+                }
+    }
+
 
     // Gets ranking order for the given game
     private fun getRankingOrder(game: Game):HashMap<String, Int>{
@@ -130,34 +196,87 @@ class HighScoreManager(firestoreInstance: FirebaseFirestore) {
     }
 
 
-    // Gets rank of a given user in a game
-    open fun getRanking(user: FirebaseUser? , game: Game): Int{
+    // Gets high-score if a given user in a game
+    // Callback returns the value of user's high-score
+    open fun getHighScore(user: FirebaseUser?, game: Game, callback: (score: Float) -> Unit){
+        if (user == null){
+            Log.w("High-ScoreManager","Given FirebaseUser was null, cannot get user's high-score!")
+            return
+        }
 
-        // Get document of the game
+        // Initialize return variable
+        var userHighScore = 0f
+
         val documentId = gameToDocumentId(game)
         fs.collection("High-Scores")
             .document(documentId).get().addOnSuccessListener {
-                document ->
-                var documentData = document.data
+                    document ->
 
-                // Form a ranking of the users
-                // TODO
-
-                // DEBUG
-                documentData?.forEach {
-                    println(it.key)
+                if (document.get(user.uid) == null){
+                    Log.i("High-ScoreManager","Given FirebaseUser has no high-score in game '$game', returning 0")
+                }
+                else{
+                    userHighScore = document.get(user.uid).toString().toFloat()
                 }
 
-                // Return the user's rank
-                // todo
+                // Invoke callback after task is done
+                callback.invoke(userHighScore)
+            }
+    }
+
+
+    // Gets rank of a given user in a game
+    // Callback returns value of the user's rank
+    open fun getRanking(user: FirebaseUser? , game: Game, callback: (rank: Int) -> Unit){
+
+        if (user == null){
+            Log.w("High-ScoreManager","Given FirebaseUser was null, cannot get user's rank!")
+            return
+        }
+
+        // Initialize return variable
+        var userRank = 0
+
+        var userHasRank = false
+
+        // Update cached leaderboard
+        updateCachedLeaderboard(game){
+
+            // Fetch the corresponding cached leaderboard
+            val cachedLeaderboard = when(game){
+                Game.SNAKE -> {
+                    cachedLeaderboardSnake
+                }
+                Game.TETRIS -> {
+                    cachedLeaderboardTetris
+                }
+                Game.TRIVIA -> {
+                    cachedLeaderboardTrivia
+                }
+                Game.SPEED -> {
+                    cachedLeaderboardTrivia
+                }
             }
 
 
-        return 0
+            cachedLeaderboard.forEach(){
+                if (user.uid == it.userId){
+                    userRank = it.rank
+                    userHasRank = true
+                }
+            }
+
+            if (!userHasRank){
+                Log.i("High-ScoreManager","Given FirebaseUser has no rank in game '$game', returning 0")
+            }
+
+            // Invoke callback after task is done
+            callback.invoke(userRank)
+        }
     }
 
 }
 
 data class LeaderboardItem(val userId: String, val userName: String, var score: Float, var rank: Int){
-    // TODO
+
 }

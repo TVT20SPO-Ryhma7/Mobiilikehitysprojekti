@@ -17,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import org.w3c.dom.Text
 
 class MainActivityLoggedIn : AppCompatActivity() {
 
@@ -31,6 +32,9 @@ class MainActivityLoggedIn : AppCompatActivity() {
     private lateinit var actionBarToggle: ActionBarDrawerToggle
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
+
+    // HighScoreManager
+    private lateinit var highScoreManager: HighScoreManager
 
     //Error logging tag
     private companion object{
@@ -55,6 +59,9 @@ class MainActivityLoggedIn : AppCompatActivity() {
 
         //Initializing firestore database
         firebaseFirestore = FirebaseFirestore.getInstance()
+
+        // Initialize HS Manager
+        highScoreManager = HighScoreManager(firebaseFirestore)
 
         //Sign out button in sidebar
         navigationView = findViewById(R.id.navigationViewLoggedIn)
@@ -92,21 +99,73 @@ class MainActivityLoggedIn : AppCompatActivity() {
         val textViewTriviaPts: TextView = findViewById(R.id.tvTriviaPoints)
         val textViewSpeedGamePoints: TextView = findViewById(R.id.tvNopeuspeliPoints)
 
-        //Getting currently logged in users points for each game and displaying them in game cardviews
-        firebaseFirestore.collection("Scores")
-            .document(firebaseAuth.currentUser!!.uid).get().addOnSuccessListener { document ->
-                var ptsString = document["MatopeliPts"].toString() +" "+ getString(R.string.points)
-                textViewMatopeliPts.text = ptsString
-                ptsString = document["TetrisPts"].toString() +" "+ getString(R.string.points)
-                textViewTetrisPts.text = ptsString
-                ptsString = document["TriviaPts"].toString() +" "+ getString(R.string.points)
-                textViewTriviaPts.text = ptsString
-                ptsString = document["SpeedGamePts"].toString() +" "+ getString(R.string.points)
-                textViewSpeedGamePoints.text = ptsString
+        // Initialize game ranks
+        val textViewGameSnakeRank: TextView = findViewById(R.id.tvMatopeliRank)
+        val textViewGameTetrisRank: TextView = findViewById(R.id.tvTetrisRank)
+        val textViewGameTriviaRank: TextView = findViewById(R.id.tvTriviaRank)
+        val textViewGameSpeedRank: TextView = findViewById(R.id.tvNopeuspeliRank)
+
+
+        // Update game score view from db
+        highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.SNAKE, callback = {
+            score ->
+            textViewMatopeliPts.text = score.toString()
+        })
+        highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.TETRIS, callback = {
+                score ->
+            textViewTetrisPts.text = score.toString()
+        })
+        highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.TRIVIA, callback = {
+                score ->
+            textViewTriviaPts.text = score.toString()
+        })
+        highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.SPEED, callback = {
+                score ->
+            textViewSpeedGamePoints.text = score.toString()
+        })
+
+        // Update game rank view from db
+        highScoreManager.getRanking(firebaseAuth.currentUser,HighScoreManager.Game.SNAKE, callback = {
+                rank ->
+            // If user has no rank in game
+            if (rank == 0){
+                textViewGameSnakeRank.text = "Unranked"
             }
-            .addOnFailureListener { e ->
-                Log.d(TAG, "Database GET failed: ", e)
+            else{
+                textViewGameSnakeRank.text = rank.toString()
             }
+
+        })
+        highScoreManager.getRanking(firebaseAuth.currentUser,HighScoreManager.Game.TETRIS, callback = {
+                rank ->
+            // If user has no rank in game
+            if (rank == 0){
+                textViewGameTetrisRank.text = "Unranked"
+            }
+            else{
+                textViewGameTetrisRank.text = rank.toString()
+            }
+        })
+        highScoreManager.getRanking(firebaseAuth.currentUser,HighScoreManager.Game.TRIVIA, callback = {
+                rank ->
+            // If user has no rank in game
+            if (rank == 0){
+                textViewGameTriviaRank.text = "Unranked"
+            }
+            else{
+                textViewGameTriviaRank.text = rank.toString()
+            }
+        })
+        highScoreManager.getRanking(firebaseAuth.currentUser,HighScoreManager.Game.SPEED, callback = {
+                rank ->
+            // If user has no rank in game
+            if (rank == 0){
+                textViewGameSpeedRank.text = "Unranked"
+            }
+            else{
+                textViewGameSpeedRank.text = rank.toString()
+            }
+        })
 
         //Sidebar button in appbar
         setSupportActionBar(findViewById(R.id.toolbar))
