@@ -71,4 +71,11 @@
     <string name="dark">Dark</string>
     <string name="buttons">Buttons</string>
     <string name="swipe">Swipe</string>
+    <string name="leaderboard" translatable="false">leaderboard</string>
+    <string name="leave" translatable="false">leave</string>
+    <string name="tetris_start" translatable="false">start</string>
+    <string name="t_tetris" translatable="false">TETRIS</string>
+    <string name="tetris_current_score">current score</string>
+    <string name="tetris_high_score">high score</string>
+    <string name="tetris_restart">restart</string>
 </resources>
