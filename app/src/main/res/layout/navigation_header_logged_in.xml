@@ -4,14 +4,14 @@
     android:layout_height="wrap_content"
     android:padding="16dp"
     android:orientation="vertical"
-    android:background="?attr/colorAccent">
+    android:background="?attr/colorPrimary">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/logged_in_as"
         android:textSize="24sp"
-        android:textColor="@color/black"/>
+        android:textColor="?attr/colorOnPrimary"/>
 
     <TextView
         android:id="@+id/tvUserName"
@@ -19,13 +19,15 @@
         android:layout_height="wrap_content"
         android:textSize="24sp"
         android:layout_marginVertical="10dp"
-        android:textColor="@color/black" />
+        android:textColor="?attr/colorOnPrimary" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogOut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="?attr/colorSecondary"
         android:text="@string/log_out"
+        android:textColor="?attr/colorOnSecondary"
         android:textSize="16sp"/>
 
 </LinearLayout>

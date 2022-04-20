@@ -37,16 +37,16 @@
                     android:id="@+id/tvMatopeli"
                     android:layout_width="210dp"
                     android:layout_height="match_parent"
-                    android:background="@color/purple_200"
+                    android:background="?attr/colorPrimary"
                     android:gravity="center"
                     android:text="@string/snake_name"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnPrimary"
                     android:textSize="30sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/teal_200"
+                    android:background="?attr/colorSecondary"
                     android:orientation="vertical"
                     android:paddingHorizontal="15dp">
 
@@ -57,14 +57,14 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="@string/points"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="25sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/global_rank"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="15sp" />
 
                     <TextView
@@ -72,7 +72,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="50th"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="15sp" />
 
                 </LinearLayout>
@@ -114,16 +114,16 @@
                     android:id="@+id/tvTetris"
                     android:layout_width="210dp"
                     android:layout_height="match_parent"
-                    android:background="@color/purple_200"
+                    android:background="?attr/colorPrimary"
                     android:gravity="center"
                     android:text="@string/tetris_name"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnPrimary"
                     android:textSize="30sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/teal_200"
+                    android:background="?attr/colorSecondary"
                     android:orientation="vertical"
                     android:paddingHorizontal="15dp">
 
@@ -134,14 +134,14 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="@string/points"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="25sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/global_rank"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="15sp" />
 
                     <TextView
@@ -149,7 +149,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="4th"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="15sp" />
 
                 </LinearLayout>
@@ -190,16 +190,16 @@
                     android:id="@+id/tvTrivia"
                     android:layout_width="210dp"
                     android:layout_height="match_parent"
-                    android:background="@color/purple_200"
+                    android:background="?attr/colorPrimary"
                     android:gravity="center"
                     android:text="@string/trivia_name"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnPrimary"
                     android:textSize="30sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/teal_200"
+                    android:background="?attr/colorSecondary"
                     android:orientation="vertical"
                     android:paddingHorizontal="15dp">
 
@@ -210,14 +210,14 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="@string/points"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="25sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/global_rank"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="15sp" />
 
                     <TextView
@@ -225,7 +225,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="20th"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="15sp" />
 
                 </LinearLayout>
@@ -266,16 +266,16 @@
                     android:id="@+id/tvNopeuspeli"
                     android:layout_width="210dp"
                     android:layout_height="match_parent"
-                    android:background="@color/purple_200"
+                    android:background="?attr/colorPrimary"
                     android:gravity="center"
                     android:text="@string/speedtest_name"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnPrimary"
                     android:textSize="30sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/teal_200"
+                    android:background="?attr/colorSecondary"
                     android:orientation="vertical"
                     android:paddingHorizontal="15dp">
 
@@ -286,14 +286,14 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="@string/points"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="25sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/global_rank"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="15sp" />
 
                     <TextView
@@ -301,7 +301,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="200th"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSecondary"
                         android:textSize="15sp" />
 
                 </LinearLayout>
