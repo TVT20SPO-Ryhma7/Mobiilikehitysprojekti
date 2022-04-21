@@ -2,6 +2,7 @@ package com.example.mobiilikehitysprojekti
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +24,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.w3c.dom.Text
+import java.util.*
 
 class MainActivityLoggedIn : AppCompatActivity() {
 
@@ -137,7 +139,7 @@ class MainActivityLoggedIn : AppCompatActivity() {
                 rank ->
             // If user has no rank in game
             if (rank == 0){
-                textViewGameSnakeRank.text = "Unranked"
+                textViewGameSnakeRank.text = getString(R.string.unranked)
             }
             else{
                 textViewGameSnakeRank.text = rank.toString()
@@ -148,7 +150,7 @@ class MainActivityLoggedIn : AppCompatActivity() {
                 rank ->
             // If user has no rank in game
             if (rank == 0){
-                textViewGameTetrisRank.text = "Unranked"
+                textViewGameTetrisRank.text = getString(R.string.unranked)
             }
             else{
                 textViewGameTetrisRank.text = rank.toString()
@@ -158,7 +160,7 @@ class MainActivityLoggedIn : AppCompatActivity() {
                 rank ->
             // If user has no rank in game
             if (rank == 0){
-                textViewGameTriviaRank.text = "Unranked"
+                textViewGameTriviaRank.text = getString(R.string.unranked)
             }
             else{
                 textViewGameTriviaRank.text = rank.toString()
@@ -168,7 +170,7 @@ class MainActivityLoggedIn : AppCompatActivity() {
                 rank ->
             // If user has no rank in game
             if (rank == 0){
-                textViewGameSpeedRank.text = "Unranked"
+                textViewGameSpeedRank.text = getString(R.string.unranked)
             }
             else{
                 textViewGameSpeedRank.text = rank.toString()
@@ -200,10 +202,18 @@ class MainActivityLoggedIn : AppCompatActivity() {
         var sharedPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         //Setting for changing theme
         var themePref: String? = sharedPref.getString("theme", "")
-        if (themePref == "Light" || themePref == "Vaalea") {
+        if (themePref == getString(R.string.light)) {
             AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
-        } else if (themePref == "Dark" || themePref == "Tumma") {
+        } else if (themePref == getString(R.string.dark)) {
             AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
+        }
+
+        //Setting for changing language
+        var languagePref: String? = sharedPref.getString("language", "")
+        if (languagePref == getString(R.string.english)) {
+            changeLanguage("en")
+        } else if (languagePref == getString(R.string.finnish)) {
+            changeLanguage("fi")
         }
 
         //Listener for clicking sidebar items
@@ -270,5 +280,21 @@ class MainActivityLoggedIn : AppCompatActivity() {
         var intent = intent
         finish()
         startActivity(intent)
+    }
+
+    private fun changeLanguage(language: String) {
+        val config = resources.configuration
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale)
+        } else {
+            config.locale = locale
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            createConfigurationContext(config)
+        }
+        resources.updateConfiguration(config, resources.displayMetrics)
     }
 }

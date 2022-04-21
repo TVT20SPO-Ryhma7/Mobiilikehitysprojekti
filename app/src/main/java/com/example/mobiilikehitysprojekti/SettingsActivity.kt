@@ -10,7 +10,6 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        changeLanguage()
         setContentView(R.layout.settings_activity)
 
         if (savedInstanceState == null) {
@@ -26,22 +25,5 @@ class SettingsActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
         }
-    }
-
-    private fun changeLanguage() {
-        val config = resources.configuration
-        val language = "fi"
-        val locale = Locale(language)
-        Locale.setDefault(locale)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            config.setLocale(locale)
-        } else {
-            config.locale = locale
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            createConfigurationContext(config)
-        }
-        resources.updateConfiguration(config, resources.displayMetrics)
     }
 }
