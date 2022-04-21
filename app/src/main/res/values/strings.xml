@@ -71,4 +71,6 @@
     <string name="dark">Dark</string>
     <string name="buttons">Buttons</string>
     <string name="swipe">Swipe</string>
+    <string name="unranked">Unranked</string>
+    <string name="select_leaderboard_to_view">Please select a leaderboard to view...</string>
 </resources>
