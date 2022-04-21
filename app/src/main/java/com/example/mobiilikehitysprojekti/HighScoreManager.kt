@@ -185,17 +185,6 @@ class HighScoreManager(firestoreInstance: FirebaseFirestore) {
                 }
     }
 
-
-    // Gets ranking order for the given game
-    private fun getRankingOrder(game: Game):HashMap<String, Int>{
-        var rankingOrder = hashMapOf<String, Int>()
-
-        // TODO
-
-        return rankingOrder
-    }
-
-
     // Gets high-score if a given user in a game
     // Callback returns the value of user's high-score
     open fun getHighScore(user: FirebaseUser?, game: Game, callback: (score: Float) -> Unit){
@@ -272,6 +261,33 @@ class HighScoreManager(firestoreInstance: FirebaseFirestore) {
 
             // Invoke callback after task is done
             callback.invoke(userRank)
+        }
+    }
+
+    // Gets the full updated leaderboard of a game
+    // Callback returns the list of LeaderboardItems
+    open fun getLeaderboard(game: Game, callback: (leaderboard: List<LeaderboardItem>) -> Unit){
+        when(game){
+            Game.SNAKE -> {
+                updateCachedLeaderboard(game){
+                    callback.invoke(cachedLeaderboardSnake)
+                }
+            }
+            Game.TETRIS -> {
+                updateCachedLeaderboard(game){
+                    callback.invoke(cachedLeaderboardTetris)
+                }
+            }
+            Game.TRIVIA -> {
+                updateCachedLeaderboard(game){
+                    callback.invoke(cachedLeaderboardTrivia)
+                }
+            }
+            Game.SPEED -> {
+                updateCachedLeaderboard(game){
+                    callback.invoke(cachedLeaderboardSpeed)
+                }
+            }
         }
     }
 

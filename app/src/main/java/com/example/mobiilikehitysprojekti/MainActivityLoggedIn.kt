@@ -110,6 +110,9 @@ class MainActivityLoggedIn : AppCompatActivity() {
         val textViewGameTriviaRank: TextView = findViewById(R.id.tvTriviaRank)
         val textViewGameSpeedRank: TextView = findViewById(R.id.tvNopeuspeliRank)
 
+        // Initialize buttons
+        val buttonViewLeaderboards: Button = findViewById(R.id.btnLeaderboards)
+
 
         // Update game score view from db
         highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.SNAKE, callback = {
@@ -172,6 +175,14 @@ class MainActivityLoggedIn : AppCompatActivity() {
             }
         })
 
+
+        // Set button listeners
+        buttonViewLeaderboards.setOnClickListener(){
+            // Start leaderboards activity
+            val leaderboardsIntent = Intent(this, Leaderboards::class.java)
+            startActivity(leaderboardsIntent)
+        }
+
         //Sidebar button in appbar
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -233,6 +244,10 @@ class MainActivityLoggedIn : AppCompatActivity() {
             }
         }
     }
+
+
+    // Listener for leaderboard view button
+
 
     //Handler for clicking appbar menu button
     override fun onSupportNavigateUp(): Boolean {
