@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.preference.PreferenceManager
+import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -89,6 +91,11 @@ class MainActivityLoggedIn : AppCompatActivity() {
         textViewUserName.text = firebaseAuth.currentUser!!.displayName
         val textViewUserInfo: TextView = findViewById(R.id.tvUserInfo)
         textViewUserInfo.text = firebaseAuth.currentUser!!.displayName
+        val imageViewProfile: ImageView = findViewById(R.id.ivAvatar)
+        val userPhoto = firebaseAuth.currentUser!!.photoUrl
+        Glide.with(this)
+            .load(userPhoto)
+            .into(imageViewProfile)
 
         //Initializing game cardview buttons
         val matopeliCard: View = findViewById(R.id.mcvMatopeli)
