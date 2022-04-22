@@ -78,7 +78,14 @@ class Leaderboards : AppCompatActivity() {
                 leaderboardText += "   "
                 leaderboardText += it.score
                 leaderboardText += "   "
-                leaderboardText += it.userName
+
+                if(it.userId == firebaseAuth.currentUser?.uid){
+                    leaderboardText += "You"
+                }
+                else{
+                    leaderboardText += it.userName
+                }
+
                 leaderboardText += "\n"
             }
 

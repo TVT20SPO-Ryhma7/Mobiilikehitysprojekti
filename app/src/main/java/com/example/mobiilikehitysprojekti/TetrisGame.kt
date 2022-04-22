@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.mobiilikehitysprojekti.tetris_models.AppModel
 import com.example.mobiilikehitysprojekti.tetris_storage.AppPreference
 import com.example.mobiilikehitysprojekti.tetris_view.TetrisView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class TetrisGame : AppCompatActivity() {
 
@@ -16,12 +18,21 @@ class TetrisGame : AppCompatActivity() {
     var tvCurrentScore: TextView? = null
     private lateinit var tetrisView: TetrisView
 
+    // Initialize firebase and hsm
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var highScoreManager: HighScoreManager
+
     var appPreferences: AppPreference? = null
     private val appModel: AppModel = AppModel()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tetrisgame)
+
+        firestore = FirebaseFirestore.getInstance()
+        firebaseAuth = FirebaseAuth.getInstance()
+        highScoreManager = HighScoreManager(firestore)
 
         appPreferences = AppPreference(this)
         appModel.setPreferences(appPreferences)
@@ -84,6 +95,12 @@ class TetrisGame : AppCompatActivity() {
 
     private fun updateHighScore() {
         tvHighScore?.text = "${appPreferences?.getHighScore()}"
+
+        if(appPreferences != null){
+            highScoreManager.updateHighScore(appPreferences!!.getHighScore(),HighScoreManager.Game.TETRIS, firebaseAuth.currentUser){
+
+            }
+        }
     }
 
     private fun updateCurrentScore() {
