@@ -17,22 +17,6 @@
         <entry key="..\:/OAMK/2022_Kevat/Mobiilikehitysprojekti/Mobiilikehitysprojekti/app/src/main/res/layout/fragment_quiz.xml" value="0.25" />
         <entry key="..\:/OAMK/2022_Kevat/Mobiilikehitysprojekti/Mobiilikehitysprojekti/app/src/main/res/layout/fragment_result.xml" value="0.33242753623188404" />
         <entry key="..\:/OAMK/2022_Kevat/Mobiilikehitysprojekti/Mobiilikehitysprojekti/app/src/main/res/menu/navigation_menu.xml" value="0.36666666666666664" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/activity_game_snake.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/fragment_quiz.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/games_view_logged_in.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/games_view_logged_out.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/navigation_header_logged_in.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/navigation_header_logged_out.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/navigation_view_logged_in.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/navigation_view_logged_out.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/profile_view_logged_in.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/profile_view_logged_out.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/settings_activity.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/tetrisgame.xml" value="0.22" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/tetrismain.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/layout/toolbar.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/menu/navigation_menu.xml" value="0.20520833333333333" />
-        <entry key="..\:/Users/HP/AndroidStudioProjects/Mobiilikehitysprojekti/app/src/main/res/xml/root_preferences.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/Henry/Documents/GitHub/Mobiilikehitysprojekti/app/src/main/res/layout/activity_game_snake.xml" value="0.33" />
         <entry key="..\:/Users/Henry/Documents/GitHub/Mobiilikehitysprojekti/app/src/main/res/layout/activity_leaderboards.xml" value="0.33" />
         <entry key="..\:/Users/Henry/Documents/GitHub/Mobiilikehitysprojekti/app/src/main/res/layout/activity_main.xml" value="0.25" />
@@ -58,6 +42,9 @@
         <entry key="..\:/Users/Matias/Desktop/Koulujutut/Mobiiliprojekti/app/src/main/res/menu/navigation_menu.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Matias/Desktop/Koulujutut/Mobiiliprojekti/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.22135416666666666" />
         <entry key="..\:/Users/Matias/Desktop/Koulujutut/Mobiiliprojekti/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.22135416666666666" />
+        <entry key="..\:/Users/henry/Documents/GitHub/Mobiilikehitysprojekti/app/src/main/res/layout/activity_leaderboards.xml" value="0.22" />
+        <entry key="..\:/Users/henry/Documents/GitHub/Mobiilikehitysprojekti/app/src/main/res/layout/activity_main_logged_in.xml" value="0.371875" />
+        <entry key="..\:/Users/henry/Documents/GitHub/Mobiilikehitysprojekti/app/src/main/res/layout/profile_view_logged_in.xml" value="0.371875" />
       </map>
     </option>
   </component>
