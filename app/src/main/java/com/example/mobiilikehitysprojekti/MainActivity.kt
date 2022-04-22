@@ -218,6 +218,8 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.mcvTetris -> {
                 //Placeholder
+                val tetrisIntent = Intent(this, TetrisGame::class.java)
+                startActivity(tetrisIntent)
                 Toast.makeText(this, "Tetris", Toast.LENGTH_SHORT).show()
             }
             R.id.mcvTrivia -> {

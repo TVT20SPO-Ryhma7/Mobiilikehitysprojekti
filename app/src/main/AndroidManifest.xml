@@ -28,6 +28,12 @@
             android:name=".GameSnake"
             android:exported="false" />
         <activity
+            android:name=".TetrisMain"
+            android:exported="false"/>
+        <activity
+            android:name=".TetrisGame"
+            android:exported="false"/>
+        <activity
             android:name=".MainActivityLoggedIn"
             android:exported="true" />
         <activity
