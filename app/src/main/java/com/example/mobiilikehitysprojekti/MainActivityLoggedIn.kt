@@ -2,12 +2,14 @@ package com.example.mobiilikehitysprojekti
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -24,6 +26,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.w3c.dom.Text
+import java.net.URL
 import java.util.*
 
 class MainActivityLoggedIn : AppCompatActivity() {
@@ -116,6 +119,10 @@ class MainActivityLoggedIn : AppCompatActivity() {
         val buttonViewLeaderboards: Button = findViewById(R.id.btnLeaderboards)
 
 
+        // Initialize profile banner
+        var imageViewAvatar: ImageView = findViewById(R.id.ivAvatar)
+
+
         // Update game score view from db
         highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.SNAKE, callback = {
             score ->
@@ -196,6 +203,10 @@ class MainActivityLoggedIn : AppCompatActivity() {
         //Listener for opening sidebar
         drawerLayout.addDrawerListener(actionBarToggle)
         actionBarToggle.syncState()
+
+        // Update user avatar on main page (NOT WORKING)
+        //var avatarUrl = URL(firebaseAuth.currentUser?.photoUrl.toString())
+        //imageViewAvatar.setImageBitmap(BitmapFactory.decodeStream(avatarUrl.openStream()))
 
         //Settings
         PreferenceManager.setDefaultValues(this, R.xml.root_preferences, false)
