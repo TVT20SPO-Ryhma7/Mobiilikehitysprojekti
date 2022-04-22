@@ -2,6 +2,7 @@ package com.example.mobiilikehitysprojekti
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -22,6 +23,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import org.w3c.dom.Text
+import java.util.*
 
 class MainActivityLoggedIn : AppCompatActivity() {
 
@@ -36,6 +39,9 @@ class MainActivityLoggedIn : AppCompatActivity() {
     private lateinit var actionBarToggle: ActionBarDrawerToggle
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
+
+    // HighScoreManager
+    private lateinit var highScoreManager: HighScoreManager
 
     //Error logging tag
     private companion object{
@@ -60,6 +66,9 @@ class MainActivityLoggedIn : AppCompatActivity() {
 
         //Initializing firestore database
         firebaseFirestore = FirebaseFirestore.getInstance()
+
+        // Initialize HS Manager
+        highScoreManager = HighScoreManager(firebaseFirestore)
 
         //Sign out button in sidebar
         navigationView = findViewById(R.id.navigationViewLoggedIn)
@@ -97,21 +106,84 @@ class MainActivityLoggedIn : AppCompatActivity() {
         val textViewTriviaPts: TextView = findViewById(R.id.tvTriviaPoints)
         val textViewSpeedGamePoints: TextView = findViewById(R.id.tvNopeuspeliPoints)
 
-        //Getting currently logged in users points for each game and displaying them in game cardviews
-        firebaseFirestore.collection("Scores")
-            .document(firebaseAuth.currentUser!!.uid).get().addOnSuccessListener { document ->
-                var ptsString = document["MatopeliPts"].toString() +" "+ getString(R.string.points)
-                textViewMatopeliPts.text = ptsString
-                ptsString = document["TetrisPts"].toString() +" "+ getString(R.string.points)
-                textViewTetrisPts.text = ptsString
-                ptsString = document["TriviaPts"].toString() +" "+ getString(R.string.points)
-                textViewTriviaPts.text = ptsString
-                ptsString = document["SpeedGamePts"].toString() +" "+ getString(R.string.points)
-                textViewSpeedGamePoints.text = ptsString
+        // Initialize game ranks
+        val textViewGameSnakeRank: TextView = findViewById(R.id.tvMatopeliRank)
+        val textViewGameTetrisRank: TextView = findViewById(R.id.tvTetrisRank)
+        val textViewGameTriviaRank: TextView = findViewById(R.id.tvTriviaRank)
+        val textViewGameSpeedRank: TextView = findViewById(R.id.tvNopeuspeliRank)
+
+        // Initialize buttons
+        val buttonViewLeaderboards: Button = findViewById(R.id.btnLeaderboards)
+
+
+        // Update game score view from db
+        highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.SNAKE, callback = {
+            score ->
+            textViewMatopeliPts.text = score.toString()
+        })
+        highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.TETRIS, callback = {
+                score ->
+            textViewTetrisPts.text = score.toString()
+        })
+        highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.TRIVIA, callback = {
+                score ->
+            textViewTriviaPts.text = score.toString()
+        })
+        highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.SPEED, callback = {
+                score ->
+            textViewSpeedGamePoints.text = score.toString()
+        })
+
+        // Update game rank view from db
+        highScoreManager.getRanking(firebaseAuth.currentUser,HighScoreManager.Game.SNAKE, callback = {
+                rank ->
+            // If user has no rank in game
+            if (rank == 0){
+                textViewGameSnakeRank.text = getString(R.string.unranked)
             }
-            .addOnFailureListener { e ->
-                Log.d(TAG, "Database GET failed: ", e)
+            else{
+                textViewGameSnakeRank.text = rank.toString()
             }
+
+        })
+        highScoreManager.getRanking(firebaseAuth.currentUser,HighScoreManager.Game.TETRIS, callback = {
+                rank ->
+            // If user has no rank in game
+            if (rank == 0){
+                textViewGameTetrisRank.text = getString(R.string.unranked)
+            }
+            else{
+                textViewGameTetrisRank.text = rank.toString()
+            }
+        })
+        highScoreManager.getRanking(firebaseAuth.currentUser,HighScoreManager.Game.TRIVIA, callback = {
+                rank ->
+            // If user has no rank in game
+            if (rank == 0){
+                textViewGameTriviaRank.text = getString(R.string.unranked)
+            }
+            else{
+                textViewGameTriviaRank.text = rank.toString()
+            }
+        })
+        highScoreManager.getRanking(firebaseAuth.currentUser,HighScoreManager.Game.SPEED, callback = {
+                rank ->
+            // If user has no rank in game
+            if (rank == 0){
+                textViewGameSpeedRank.text = getString(R.string.unranked)
+            }
+            else{
+                textViewGameSpeedRank.text = rank.toString()
+            }
+        })
+
+
+        // Set button listeners
+        buttonViewLeaderboards.setOnClickListener(){
+            // Start leaderboards activity
+            val leaderboardsIntent = Intent(this, Leaderboards::class.java)
+            startActivity(leaderboardsIntent)
+        }
 
         //Sidebar button in appbar
         setSupportActionBar(findViewById(R.id.toolbar))
@@ -130,10 +202,18 @@ class MainActivityLoggedIn : AppCompatActivity() {
         var sharedPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         //Setting for changing theme
         var themePref: String? = sharedPref.getString("theme", "")
-        if (themePref == "Light" || themePref == "Vaalea") {
+        if (themePref == getString(R.string.light)) {
             AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
-        } else if (themePref == "Dark" || themePref == "Tumma") {
+        } else if (themePref == getString(R.string.dark)) {
             AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
+        }
+
+        //Setting for changing language
+        var languagePref: String? = sharedPref.getString("language", "")
+        if (languagePref == getString(R.string.english)) {
+            changeLanguage("en")
+        } else if (languagePref == getString(R.string.finnish)) {
+            changeLanguage("fi")
         }
 
         //Listener for clicking sidebar items
@@ -176,6 +256,10 @@ class MainActivityLoggedIn : AppCompatActivity() {
         }
     }
 
+
+    // Listener for leaderboard view button
+
+
     //Handler for clicking appbar menu button
     override fun onSupportNavigateUp(): Boolean {
         drawerLayout.openDrawer(navigationView)
@@ -197,5 +281,21 @@ class MainActivityLoggedIn : AppCompatActivity() {
         var intent = intent
         finish()
         startActivity(intent)
+    }
+
+    private fun changeLanguage(language: String) {
+        val config = resources.configuration
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale)
+        } else {
+            config.locale = locale
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            createConfigurationContext(config)
+        }
+        resources.updateConfiguration(config, resources.displayMetrics)
     }
 }

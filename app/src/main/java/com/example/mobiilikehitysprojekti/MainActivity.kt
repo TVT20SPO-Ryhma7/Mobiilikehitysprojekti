@@ -3,6 +3,7 @@ package com.example.mobiilikehitysprojekti
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import java.lang.Exception
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -104,10 +106,18 @@ class MainActivity : AppCompatActivity() {
         var sharedPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         //Setting for changing theme
         var themePref: String? = sharedPref.getString("theme", "")
-        if (themePref == "Light" || themePref == "Vaalea") {
+        if (themePref == getString(R.string.light)) {
             AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
-        } else if (themePref == "Dark" || themePref == "Tumma") {
+        } else if (themePref == getString(R.string.dark)) {
             AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
+        }
+
+        //Setting for changing language
+        var languagePref: String? = sharedPref.getString("language", "")
+        if (languagePref == getString(R.string.english)) {
+            changeLanguage("en")
+        } else if (languagePref == getString(R.string.finnish)) {
+            changeLanguage("fi")
         }
 
         //Listener for clicking sidebar items
@@ -245,5 +255,21 @@ class MainActivity : AppCompatActivity() {
         var intent = intent
         finish()
         startActivity(intent)
+    }
+
+    private fun changeLanguage(language: String) {
+        val config = resources.configuration
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale)
+        } else {
+            config.locale = locale
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            createConfigurationContext(config)
+        }
+        resources.updateConfiguration(config, resources.displayMetrics)
     }
 }

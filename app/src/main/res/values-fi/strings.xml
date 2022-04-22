@@ -71,4 +71,6 @@
     <string name="dark">Tumma</string>
     <string name="buttons">Näppäimet</string>
     <string name="swipe">Pyyhkäisy</string>
+    <string name="unranked">Ei pistesijaa</string>
+    <string name="select_leaderboard_to_view">Valitse peli nähdäksesi pistetaulukon...</string>
 </resources>

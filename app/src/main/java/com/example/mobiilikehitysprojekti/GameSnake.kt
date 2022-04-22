@@ -137,7 +137,6 @@ class GameSnake : AppCompatActivity() {
         // Prompt the user to start game by pressing any button
         val txtPressAny = getString(R.string.press_any_button_to_start_game)
         Toast.makeText(this,txtPressAny,Toast.LENGTH_SHORT).show()
-        Toast.makeText(this,"Firebase: " + firebaseAuth.currentUser?.email.toString(),Toast.LENGTH_SHORT).show()
 
         groupGameOver.visibility = View.INVISIBLE
 
@@ -415,7 +414,7 @@ private class GameSnakeEngine(gameSizeX: Int, gameSizeY: Int, snakeStartLength: 
         // Do not execute any logic if game is paused or over
         if (isPaused || gameOver){return}
 
-        Log.i("Game", "Tick: $currentTick")
+        //Log.i("Game", "Tick: $currentTick")
 
         // Move snake according to proposed changes
         if (snake.move(stagedSnakeNextMoveDirection)){
