@@ -67,10 +67,10 @@
                             android:textAlignment="center"
                             android:textColor="@color/black"
                             />
-
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:layout_marginTop="10dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_baseline_sports_esports_24" />
 
@@ -99,9 +99,11 @@
                             android:textColor="@color/black"
                             />
                         <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            />
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_baseline_sports_football_24" />
 
                     </com.google.android.material.card.MaterialCardView>
 
@@ -127,6 +129,12 @@
                             android:textAlignment="center"
                             android:textColor="@color/black"
                             />
+                        <ImageView
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_baseline_music_note_24" />
 
                     </com.google.android.material.card.MaterialCardView>
 
@@ -152,6 +160,12 @@
                             android:textAlignment="center"
                             android:textColor="@color/black"
                             />
+                        <ImageView
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_baseline_directions_car_24" />
 
                     </com.google.android.material.card.MaterialCardView>
 
@@ -177,6 +191,12 @@
                             android:textAlignment="center"
                             android:textColor="@color/black"
                             />
+                        <ImageView
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_baseline_location_on_24" />
 
                     </com.google.android.material.card.MaterialCardView>
 
