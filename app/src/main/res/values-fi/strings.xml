@@ -71,6 +71,17 @@
     <string name="dark">Tumma</string>
     <string name="buttons">Näppäimet</string>
     <string name="swipe">Pyyhkäisy</string>
+    <string name="leaderboard">tulostaulu</string>
+    <string name="leave">poistu</string>
+    <string name="tetris_start">aloita</string>
+    <string name="t_tetris">TETRIS</string>
+    <string name="tetris_current_score">nykyiset pisteet</string>
+    <string name="tetris_high_score">piste-ennätys</string>
+    <string name="tetris_restart">restart</string>
     <string name="unranked">Ei pistesijaa</string>
     <string name="select_leaderboard_to_view">Valitse peli nähdäksesi pistetaulukon...</string>
+    <string name="rank">Sija</string>
+    <string name="score">Pisteet</string>
+    <string name="username">Käyttäjä</string>
+    <string name="you">Sinä</string>
 </resources>

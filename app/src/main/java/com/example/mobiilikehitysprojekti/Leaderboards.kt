@@ -2,10 +2,12 @@ package com.example.mobiilikehitysprojekti
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.math.roundToInt
 
 class Leaderboards : AppCompatActivity() {
 
@@ -18,6 +20,7 @@ class Leaderboards : AppCompatActivity() {
 
     // Components
     private lateinit var tvLeaderboard: TextView
+    private lateinit var tvLeaderboardName: TextView
     private lateinit var bSelectSnake: Button
     private lateinit var bSelectTetris: Button
     private lateinit var bSelectTrivia: Button
@@ -36,6 +39,7 @@ class Leaderboards : AppCompatActivity() {
 
         // Initialize components
         tvLeaderboard = findViewById(R.id.textViewLeaderboard)
+        tvLeaderboardName = findViewById(R.id.tvLeaderboardGameName)
         bSelectSnake = findViewById(R.id.buttonSelectSnake)
         bSelectTetris = findViewById(R.id.buttonSelectTetris)
         bSelectTrivia = findViewById(R.id.buttonSelectTrivia)
@@ -43,44 +47,46 @@ class Leaderboards : AppCompatActivity() {
 
         // Set button listeners
         bSelectSnake.setOnClickListener(){
-            loadLeaderboard(HighScoreManager.Game.SNAKE)
+            loadLeaderboard(HighScoreManager.Game.SNAKE, getString(R.string.snake_name))
         }
         bSelectTetris.setOnClickListener(){
-            loadLeaderboard(HighScoreManager.Game.TETRIS)
+            loadLeaderboard(HighScoreManager.Game.TETRIS, getString(R.string.tetris_name))
         }
         bSelectTrivia.setOnClickListener(){
-            loadLeaderboard(HighScoreManager.Game.TRIVIA)
+            loadLeaderboard(HighScoreManager.Game.TRIVIA, getString(R.string.trivia_name))
         }
         bSelectSpeed.setOnClickListener() {
-            loadLeaderboard(HighScoreManager.Game.SPEED)
+            loadLeaderboard(HighScoreManager.Game.SPEED, getString(R.string.speedtest_name))
         }
 
 
     }
 
     // Loads given game leaderboard on to the leaderboard view
-    private fun loadLeaderboard(game: HighScoreManager.Game){
+    private fun loadLeaderboard(game: HighScoreManager.Game, gameName: String){
 
         // Gets the leaderboard
         highScoreManager.getLeaderboard(game){
             leaderboard ->
 
+            tvLeaderboardName.visibility = View.VISIBLE
+
+            tvLeaderboardName.text = gameName + " " + getString(R.string.leaderboard)
+
             // Begin constructing text to display for the leaderboard
             var leaderboardText: String = ""
 
-            leaderboardText += "$game LEADERBOARD"
-            leaderboardText += "\n"
-            leaderboardText += "Rank / Score / Username"
+            leaderboardText += getString(R.string.rank) + " / " + getString(R.string.score) + " / " + getString(R.string.username)
             leaderboardText += "\n"
 
             leaderboard.forEach(){
                 leaderboardText += it.rank.toString()
-                leaderboardText += "   "
-                leaderboardText += it.score
-                leaderboardText += "   "
+                leaderboardText += "         "
+                leaderboardText += it.score.roundToInt()
+                leaderboardText += "             "
 
                 if(it.userId == firebaseAuth.currentUser?.uid){
-                    leaderboardText += "You"
+                    leaderboardText += getString(R.string.you)
                 }
                 else{
                     leaderboardText += it.userName

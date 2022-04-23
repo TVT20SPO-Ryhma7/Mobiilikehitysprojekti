@@ -29,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import org.w3c.dom.Text
 import java.net.URL
 import java.util.*
+import kotlin.math.roundToInt
 
 class MainActivityLoggedIn : AppCompatActivity() {
 
@@ -93,11 +94,6 @@ class MainActivityLoggedIn : AppCompatActivity() {
         textViewUserName.text = firebaseAuth.currentUser!!.displayName
         val textViewUserInfo: TextView = findViewById(R.id.tvUserInfo)
         textViewUserInfo.text = firebaseAuth.currentUser!!.displayName
-        val imageViewProfile: ImageView = findViewById(R.id.ivAvatar)
-        val userPhoto = firebaseAuth.currentUser!!.photoUrl
-        Glide.with(this)
-            .load(userPhoto)
-            .into(imageViewProfile)
 
         //Initializing game cardview buttons
         val matopeliCard: View = findViewById(R.id.mcvMatopeli)
@@ -127,24 +123,28 @@ class MainActivityLoggedIn : AppCompatActivity() {
 
         // Initialize profile banner
         var imageViewAvatar: ImageView = findViewById(R.id.ivAvatar)
+        val userPhoto = firebaseAuth.currentUser!!.photoUrl
+        Glide.with(this)
+            .load(userPhoto)
+            .into(imageViewAvatar)
 
 
         // Update game score view from db
         highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.SNAKE, callback = {
             score ->
-            textViewMatopeliPts.text = score.toString()
+            textViewMatopeliPts.text = getString(R.string.score_atm) + " " + score.roundToInt().toString()
         })
         highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.TETRIS, callback = {
                 score ->
-            textViewTetrisPts.text = score.toString()
+            textViewTetrisPts.text = getString(R.string.score_atm) + " " + score.roundToInt().toString()
         })
         highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.TRIVIA, callback = {
                 score ->
-            textViewTriviaPts.text = score.toString()
+            textViewTriviaPts.text = getString(R.string.score_atm) + " " + score.roundToInt().toString()
         })
         highScoreManager.getHighScore(firebaseAuth.currentUser,HighScoreManager.Game.SPEED, callback = {
                 score ->
-            textViewSpeedGamePoints.text = score.toString()
+            textViewSpeedGamePoints.text = getString(R.string.score_atm) + " " + score.roundToInt().toString()
         })
 
         // Update game rank view from db
@@ -209,10 +209,6 @@ class MainActivityLoggedIn : AppCompatActivity() {
         //Listener for opening sidebar
         drawerLayout.addDrawerListener(actionBarToggle)
         actionBarToggle.syncState()
-
-        // Update user avatar on main page (NOT WORKING)
-        //var avatarUrl = URL(firebaseAuth.currentUser?.photoUrl.toString())
-        //imageViewAvatar.setImageBitmap(BitmapFactory.decodeStream(avatarUrl.openStream()))
 
         //Settings
         PreferenceManager.setDefaultValues(this, R.xml.root_preferences, false)

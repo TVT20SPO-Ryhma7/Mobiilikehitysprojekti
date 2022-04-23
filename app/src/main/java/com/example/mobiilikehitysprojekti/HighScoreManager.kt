@@ -243,7 +243,7 @@ class HighScoreManager(firestoreInstance: FirebaseFirestore) {
                     cachedLeaderboardTrivia
                 }
                 Game.SPEED -> {
-                    cachedLeaderboardTrivia
+                    cachedLeaderboardSpeed
                 }
             }
 
