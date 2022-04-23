@@ -26,7 +26,7 @@
                     android:layout_marginBottom="16dp"
                     android:gravity="center"
                     android:textSize="24sp"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnBackground"
                     android:text="@string/question_will_be_displayed_here"/>
 
                 <ImageView
@@ -56,6 +56,7 @@
                             android:layout_margin="10dp"
                             android:textAlignment="center"
                             android:textSize="18sp"
+                            android:textColor="@color/black"
                             android:text="@string/option_one"/>
 
                         <androidx.appcompat.widget.AppCompatButton
@@ -66,6 +67,7 @@
                             android:layout_margin="10dp"
                             android:textAlignment="center"
                             android:textSize="18sp"
+                            android:textColor="@color/black"
                             android:text="@string/option_two"/>
 
                     </LinearLayout>
@@ -83,6 +85,7 @@
                             android:layout_margin="10dp"
                             android:textAlignment="center"
                             android:textSize="18sp"
+                            android:textColor="@color/black"
                             android:text="@string/option_three"/>
 
                         <androidx.appcompat.widget.AppCompatButton
@@ -93,6 +96,7 @@
                             android:layout_margin="10dp"
                             android:textAlignment="center"
                             android:textSize="18sp"
+                            android:textColor="@color/black"
                             android:text="@string/option_four"/>
 
                     </LinearLayout>

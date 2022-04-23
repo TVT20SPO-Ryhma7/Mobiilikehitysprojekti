@@ -6,42 +6,44 @@
     android:layout_height="match_parent"
     tools:context=".Leaderboards">
 
-    <Button
-        android:id="@+id/buttonSelectTrivia"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
-        android:text="@string/trivia_name"
-        app:layout_constraintEnd_toStartOf="@+id/buttonSelectSpeed"
-        tools:layout_editor_absoluteY="16dp" />
-
-    <Button
-        android:id="@+id/buttonSelectSpeed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="@string/speedtest_name"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:layout_editor_absoluteY="16dp" />
-
-    <Button
-        android:id="@+id/buttonSelectSnake"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/snake_name"
-        app:layout_constraintEnd_toStartOf="@+id/buttonSelectTetris"
-        app:layout_constraintHorizontal_bias="0.41"
+        android:orientation="horizontal"
+        android:layout_marginTop="6dp"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="16dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <Button
-        android:id="@+id/buttonSelectTetris"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:text="@string/tetris_name"
-        app:layout_constraintEnd_toStartOf="@+id/buttonSelectTrivia"
-        tools:layout_editor_absoluteY="16dp" />
+        <Button
+            android:id="@+id/buttonSelectTrivia"
+            android:layout_width="84dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:text="@string/trivia_name" />
+
+        <Button
+            android:id="@+id/buttonSelectSpeed"
+            android:layout_width="124dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:text="@string/speedtest_name" />
+
+        <Button
+            android:id="@+id/buttonSelectSnake"
+            android:layout_width="83dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:text="@string/snake_name" />
+
+        <Button
+            android:id="@+id/buttonSelectTetris"
+            android:layout_width="86dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="@string/tetris_name" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/textViewLeaderboard"
