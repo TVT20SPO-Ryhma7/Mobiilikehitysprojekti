@@ -25,17 +25,21 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/tetris_current_score"
                     android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp"
+                    android:textColor="@color/dark_grey"
+                    android:textStyle="bold" />
+
                 <TextView
                     android:id="@+id/tv_current_score"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/dark_grey"
                     android:textSize="18sp"/>
                 <TextView
                     android:layout_width="wrap_content"
@@ -44,11 +48,13 @@
                     android:text="@string/tetris_high_score"
                     android:textAllCaps="true"
                     android:textStyle="bold"
+                    android:textColor="@color/dark_grey"
                     android:textSize="14sp"/>
                 <TextView
                     android:id="@+id/tv_high_score"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/dark_grey"
                     android:textSize="18sp"/>
             </LinearLayout>
             <Button
