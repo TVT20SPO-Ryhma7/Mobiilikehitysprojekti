@@ -63,8 +63,6 @@
     <string name="play_again">Play Again</string>
     <string name="game_paused">Game Paused</string>
     <string name="press_any_button_to_start_game">Press any button to start the game!</string>
-    <string name="snake_hit_its_own_tail">Snake hit its own tail</string>
-    <string name="snake_hit_a_wall">Snake hit a wall</string>
     <string name="english">English</string>
     <string name="finnish">Finnish</string>
     <string name="light">Light</string>
@@ -84,4 +82,5 @@
     <string name="score">Score</string>
     <string name="username">Username</string>
     <string name="you">You</string>
+    <string name="new_highscore_caps">NEW HIGHSCORE!</string>
 </resources>

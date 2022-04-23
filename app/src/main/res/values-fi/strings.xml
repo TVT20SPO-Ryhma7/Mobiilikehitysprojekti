@@ -63,8 +63,6 @@
     <string name="play_again">Pelaa uudestaan</string>
     <string name="game_paused">Peli pysäytetty</string>
     <string name="press_any_button_to_start_game">Paina mitä tahansa näppäintä aloittaaksesi!</string>
-    <string name="snake_hit_its_own_tail">Mato osui itseensä</string>
-    <string name="snake_hit_a_wall">Mato osui seinään</string>
     <string name="english">Englanti</string>
     <string name="finnish">Suomi</string>
     <string name="light">Vaalea</string>
@@ -84,4 +82,5 @@
     <string name="score">Pisteet</string>
     <string name="username">Käyttäjä</string>
     <string name="you">Sinä</string>
+    <string name="new_highscore_caps">UUSI ENNÄTYS!</string>
 </resources>

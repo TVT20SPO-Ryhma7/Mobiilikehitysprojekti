@@ -245,7 +245,7 @@ class GameSnake : AppCompatActivity() {
             gameSnakeEngine.nextTick()
 
             // Update text view for the score
-            val scoreText = getString(R.string.score_atm) + gameSnakeEngine.score.toString()
+            val scoreText = getString(R.string.score_atm) + " " + gameSnakeEngine.score.toString()
             textScore.text = scoreText
 
             // Reset next input
@@ -283,7 +283,7 @@ class GameSnake : AppCompatActivity() {
                 // If new high-score was recorded
                 if (result){
                     // Update text views
-                    textGameOverHighScore.text = "NEW HIGH-SCORE!"
+                    textGameOverHighScore.text = getString(R.string.new_highscore_caps)
                 }
                 else{
                     // Update text views
@@ -419,7 +419,13 @@ private class GameSnakeEngine(gameSizeX: Int, gameSizeY: Int, snakeStartLength: 
         // Move snake according to proposed changes
         if (snake.move(stagedSnakeNextMoveDirection)){
             gameOver = true
-            gameOverReason = "Snake hit its own tail"
+
+            val language = Locale.getDefault().language
+            gameOverReason = if (language == "en") {
+                "snake hit its own tail"
+            } else {
+                "mato osui itseensä"
+            }
         }
 
 
@@ -431,7 +437,13 @@ private class GameSnakeEngine(gameSizeX: Int, gameSizeY: Int, snakeStartLength: 
             || snake.getSnakeHead().x < 0 || snake.getSnakeHead().y  < 0 )
         {
             gameOver = true
-            gameOverReason = "Snake hit a wall"
+
+            val language = Locale.getDefault().language
+            gameOverReason = if (language == "en") {
+                "snake hit a wall"
+            } else {
+                "mato osui seinään"
+            }
         }
 
         // If game over conditions have been met
