@@ -55,11 +55,12 @@ class TetrisGame : AppCompatActivity() {
         appModel.restartGame()
     }
 
-    private fun onTetrisViewTouch(view: View, event: MotionEvent):
+    private fun onTetrisViewTouch(view: View, event: MotionEvent): 
             Boolean {
-        if (appModel.isGameOver() || appModel.isGameAwaitingStart()) {
-            appModel.startGame()
-            tetrisView.setGameCommandWithDelay(AppModel.Motions.DOWN)
+        if (appModel.isGameOver() || appModel.isGameAwaitingStart()) { 
+            appModel.startGame() 
+            tetrisView.setGameCommandWithDelay(AppModel.Motions.DOWN) 
+            //Keeps track on the screen and games state to decide if the game is to be launched or block moved when the screen is touched
 
         } else if(appModel.isGameActive()) {
             when (resolveTouchDirection(view, event)) {
@@ -67,7 +68,7 @@ class TetrisGame : AppCompatActivity() {
                 1 -> moveTetromino(AppModel.Motions.ROTATE)
                 2 -> moveTetromino(AppModel.Motions.DOWN)
                 3 -> moveTetromino(AppModel.Motions.RIGHT)
-            }
+            } //on-touch listener for the blocks movement
         }
         return true
     }
